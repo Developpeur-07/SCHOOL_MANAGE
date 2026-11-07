@@ -1,0 +1,11 @@
+{
+  "name": "school-manage-database-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:db": "node --test --test-concurrency=1 supabase/tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.15"
+  }
+}
