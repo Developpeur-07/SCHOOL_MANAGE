@@ -1,0 +1,64 @@
+{
+  "app": {
+    "name": "SCHOOL_MANAGE",
+    "tagline": "L’école vous informe, simplement.",
+    "loading": "Chargement…",
+    "home": "Accueil"
+  },
+  "common": {
+    "skipToContent": "Aller au contenu",
+    "logout": "Se déconnecter",
+    "logoutPending": "Déconnexion…",
+    "retry": "Réessayer",
+    "errorTitle": "Une erreur est survenue",
+    "errorBody": "La page n’a pas pu être chargée. Vérifiez votre connexion puis réessayez.",
+    "configurationTitle": "Configuration Supabase requise",
+    "configurationBody": "Renseignez les variables publiques NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY pour activer la connexion."
+  },
+  "auth": {
+    "loginTitle": "Connexion à votre espace",
+    "loginSubtitle": "Utilisez le compte fourni par votre école.",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "vous@exemple.org",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "submit": "Se connecter",
+    "submitPending": "Connexion…",
+    "invalidCredentials": "E-mail ou mot de passe incorrect.",
+    "genericError": "Connexion impossible pour le moment. Vérifiez votre réseau et réessayez.",
+    "disabledTitle": "Compte désactivé",
+    "disabledBody": "Votre compte est désactivé. Contactez votre école pour vérifier votre accès."
+  },
+  "roles": {
+    "parent": "Parent",
+    "direction": "Direction",
+    "secretary": "Secrétariat",
+    "accountant": "Comptable",
+    "teacher": "Enseignant",
+    "supervisor": "Surveillant"
+  },
+  "parent": {
+    "title": "Espace parent",
+    "childSelector": "Enfant consulté",
+    "selectChild": "Choisir un enfant",
+    "selectChildHint": "Sélectionnez l’enfant dont vous souhaitez ouvrir l’espace.",
+    "noChildrenTitle": "Aucun enfant rattaché",
+    "noChildrenBody": "Votre compte ne possède aucun lien actif avec un enfant. Contactez le secrétariat de votre école.",
+    "childSpaceTitle": "Espace de {studentName}",
+    "class": "Classe",
+    "readyBody": "Votre accès parent et le lien avec cet enfant sont actifs. Les informations scolaires seront ajoutées à l’étape 5."
+  },
+  "school": {
+    "title": "Portail école",
+    "readyBody": "Votre accès est actif. Les outils de gestion seront ajoutés à l’étape 6, selon votre rôle."
+  },
+  "teacher": {
+    "title": "Espace enseignant",
+    "readyBody": "Votre accès est actif. Les outils de saisie seront ajoutés à l’étape 6, selon votre rôle."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n’existe pas ou vous n’avez pas l’autorisation d’y accéder.",
+    "action": "Revenir à mon espace"
+  }
+}
