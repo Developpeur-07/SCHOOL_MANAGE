@@ -73,6 +73,37 @@ test('le rôle interne ne peut ni se connecter ni contourner RLS', async () => {
     rolbypassrls: false,
   });
 
+  const permanentMemberships = await queryRows(
+    database,
+    `select membership.inherit_option, membership.set_option
+     from pg_auth_members as membership
+     join pg_roles as owned_role on owned_role.oid = membership.roleid
+     join pg_roles as member_role on member_role.oid = membership.member
+     where owned_role.rolname = 'school_manage_internal'
+       and member_role.rolname = 'postgres'`,
+  );
+  // Supabase peut conserver une ligne d’administration émise par
+  // supabase_admin. Elle ne doit jamais permettre INHERIT ou SET ROLE.
+  for (const membership of permanentMemberships) {
+    assert.equal(membership.inherit_option, false);
+    assert.equal(membership.set_option, false);
+  }
+
+  const [schema] = await queryRows(
+    database,
+    `select nspacl::text as access_list
+     from pg_namespace where nspname = 'public'`,
+  );
+  assert.match(schema.access_list, /school_manage_internal=U\//);
+  assert.doesNotMatch(schema.access_list, /school_manage_internal=[^,}]*C/);
+
+  const [authSchema] = await queryRows(
+    database,
+    `select nspacl::text as access_list
+     from pg_namespace where nspname = 'auth'`,
+  );
+  assert.doesNotMatch(authSchema.access_list, /school_manage_internal=/);
+
   const tableGrants = await queryRows(
     database,
     `select table_name, privilege_type

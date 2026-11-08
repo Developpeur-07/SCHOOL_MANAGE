@@ -10,8 +10,18 @@ end;
 $$;
 
 alter role school_manage_internal nologin noinherit nobypassrls;
+
+-- Supabase exige que le propriétaire initial puisse faire SET ROLE sur le
+-- futur propriétaire des fonctions. Cette appartenance est uniquement un
+-- mécanisme de migration ; ses droits SET/INHERIT sont révoqués en fin de
+-- fichier. Supabase peut conserver une ligne d’administration supabase_admin
+-- sans SET ni INHERIT. Le rôle interne reste NOLOGIN, NOINHERIT et NOBYPASSRLS.
+-- CREATE est également temporaire : PostgreSQL l’exige du futur propriétaire
+-- lors d’un ALTER FUNCTION ... OWNER sur Supabase non superutilisateur.
+grant school_manage_internal to postgres;
+
 revoke all on schema public from school_manage_internal;
-grant usage on schema public to school_manage_internal;
+grant usage, create on schema public to school_manage_internal;
 grant select on public.profiles to school_manage_internal;
 grant insert on public.audit_log to school_manage_internal;
 grant usage on schema auth to school_manage_internal;
@@ -597,3 +607,7 @@ create trigger announcement_targets_audit after insert or update or delete on pu
 for each row execute function public.audit_business_change();
 create trigger notifications_audit after insert or update or delete on public.notifications
 for each row execute function public.audit_business_change();
+
+-- Ne laisser ni création de schéma ni appartenance administrative permanente.
+revoke create on schema public from school_manage_internal;
+revoke school_manage_internal from postgres;

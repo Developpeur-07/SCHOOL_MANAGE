@@ -89,7 +89,7 @@ Les lignes `auth.users` du seed de l’étape 2 ont un mot de passe vide et ne p
 
 **Téléphone non implémenté à cette étape :** Supabase prend en charge l’OTP téléphone, mais aucun fournisseur SMS ni configuration Auth réelle n’est accessible. Ajouter ce parcours sans le tester créerait une fonctionnalité non fiable et pourrait engendrer des coûts. Il ne sera envisagé qu’après accès à une configuration de test explicite.
 
-Aucune requête SQL n’a été exécutée sur le projet Supabase hébergé de l’utilisateur et aucune migration distante n’est associée à cette étape.
+Après autorisation explicite, les migrations distantes 3 à 5 ont été appliquées sur le projet LIAKOLO et la RLS a été vérifiée en lecture avec des claims JWT fictifs. Les migrations 1 et 2 ainsi que le seed étaient déjà présents et n’ont pas été rejoués. Voir `docs/SECURITE.md`, section 8.4. Aucun mot de passe n’a été modifié.
 
 ## 6. Sécurité
 

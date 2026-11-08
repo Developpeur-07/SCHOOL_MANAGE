@@ -11,6 +11,8 @@
 | `supabase/migrations/20261107000001_core_schema.sql` | Types, écoles, profils, référentiel, élèves, liens tuteurs et index |
 | `supabase/migrations/20261107000002_business_events.sql` | Notes, présences, finances, annonces, notifications, audit et contraintes métier |
 | `supabase/migrations/20261107000003_rls_and_audit.sql` | Rôle interne minimal, politiques RLS, privilèges et triggers d’audit |
+| `supabase/migrations/20261107000004_supabase_auth_privileges.sql` | Privilèges Auth minimaux tentés sur Supabase, conservés pour la traçabilité |
+| `supabase/migrations/20261107000005_jwt_without_auth_schema.sql` | Lecture directe des claims JWT dans les fonctions internes, sans privilège sur le schéma `auth` |
 | `supabase/seed.sql` | Deux écoles fictives, comptes Auth sans mot de passe utilisable et données de démonstration |
 | `supabase/tests/helpers.mjs` | Harnais PostgreSQL local et simulation minimale de `auth.users`/`auth.uid()` |
 | `supabase/tests/rls.test.mjs` | 32 tests d’isolation, de droits et de règles métier |
@@ -247,7 +249,7 @@ Aucun binaire Supabase, PostgreSQL ou Docker n’était disponible. Les tests ut
 - Node.js 22 et le runner `node:test` ;
 - `@electric-sql/pglite` **0.5.15**, PostgreSQL réel compilé en WASM ;
 - un bootstrap minimal pour `auth.users` et `auth.uid()`, seuls éléments Supabase simulés ;
-- les trois migrations et `seed.sql` exécutés sans réécriture.
+- les cinq migrations et `seed.sql` exécutés sans réécriture.
 
 PGlite occupe environ 26,3 MB décompressés : c’est une dépendance lourde, mais **exclusivement de développement**, absente du bundle et justifiée par la nécessité d’exécuter réellement RLS, triggers et contraintes sans Docker. Elle n’est pas une dépendance de la future PWA.
 
@@ -285,15 +287,31 @@ Dernier résultat obtenu : **32 tests réussis, 0 échec**.
 
 ### 8.3 Ce qui n’a pas été testé
 
-- Supabase CLI, une instance Supabase hébergée, GoTrue réel et PostgREST réel ;
-- les droits exacts du rôle `postgres` de la plateforme pour `CREATE ROLE`/`ALTER FUNCTION ... OWNER` ;
+- Supabase CLI, une connexion GoTrue réelle et les requêtes PostgREST de l’application ;
 - les comptes du seed avec Supabase Auth réel ;
 - la concurrence avec plusieurs connexions PostgreSQL simultanées, malgré le verrou prévu ;
 - les performances de politiques et index sous forte charge ;
 - Realtime, Web Push, caches PWA et sécurité des futures Server Actions ;
 - un test de charge sur la diffusion à toute une école.
 
-Ces points ne doivent pas être présentés comme validés. Une exécution Supabase locale avec Docker/CLI est requise avant toute application distante.
+Ces points ne doivent pas être présentés comme validés. La validation SQL hébergée ci-dessous ne remplace ni un parcours Auth réel ni les tests de l’API.
+
+### 8.4 Validation sur Supabase hébergé — 7 novembre 2026
+
+Avec l’autorisation explicite de l’utilisateur, le projet unique **LIAKOLO** (`xaxwfrofmrawqojewigq`, eu-west-1) a été inspecté puis complété via le connecteur Supabase :
+
+- les migrations 1 et 2 ainsi que les 13 utilisateurs fictifs du seed étaient déjà présents ; ils n’ont pas été rejoués ni modifiés ;
+- la migration 3 a été appliquée après deux échecs entièrement annulés, liés aux transferts de propriété sur une plateforme non superutilisateur ;
+- les migrations 4 et 5 documentent et corrigent la particularité Supabase des privilèges sur le schéma `auth` ;
+- la version distante finale contient **15 tables RLS + FORCE RLS, 41 politiques et 14 triggers d’audit** ;
+- le rôle interne reste `NOLOGIN`, `NOINHERIT`, `NOBYPASSRLS`, sans `CREATE` sur `public` ni `USAGE` sur `auth` ;
+- Supabase conserve une ligne d’administration `supabase_admin` entre `postgres` et le rôle interne, mais `SET`, `INHERIT` et `USAGE` du rôle sont tous refusés ;
+- les trois fonctions internes appartiennent à `school_manage_internal`, avec `row_security=on`, et lisent les mêmes claims JWT que la définition publique de `auth.uid()` sans accéder au schéma `auth` ;
+- aucun accès anonyme aux tables n’est présent.
+
+Un bloc SQL en lecture seule, exécuté sous le rôle `authenticated` avec des claims JWT fictifs, a vérifié sur la base hébergée : deux enfants visibles pour le parent lié, aucun enfant pour le parent sans lien, aucune fuite inter-écoles et aucun brouillon de note visible.
+
+Aucun mot de passe n’a été créé ou modifié. La connexion Auth réelle et PostgREST restent donc à tester séparément.
 
 ## 9. Procédure avant tout environnement distant
 
@@ -305,13 +323,13 @@ Ces points ne doivent pas être présentés comme validés. Une exécution Supab
 6. Sauvegarder et rédiger un plan de retour arrière avant toute migration validée.
 7. Ne jamais lancer le seed ou une migration sur la production depuis la CI de test.
 
-Aucune de ces actions distantes n’a été effectuée à l’étape 2.
+Aucune de ces actions distantes n’a été effectuée à l’étape 2. L’exécution hébergée autorisée ultérieurement est consignée en 8.4 ; elle ne dispense pas des sauvegardes et validations prévues pour les prochaines migrations.
 
 ## 10. Risques restants
 
 | Niveau | Risque / limite | Traitement attendu |
 | --- | --- | --- |
-| Élevé | SQL non validé sur Supabase CLI/hébergé ; compatibilité des privilèges et du seed Auth non prouvée | Test local Supabase obligatoire avant toute cible distante |
+| Moyen | SQL hébergé et RLS en lecture validés, mais Supabase CLI, GoTrue et PostgREST non testés | Provisionner un compte fictif autorisé et tester le parcours applicatif réel |
 | Moyen | Enseignants/surveillants étendus à toute l’école faute d’affectations | Valider cette étendue ou demander une évolution du schéma avant le portail |
 | Moyen | Notifications automatiques et résolution des impayés absentes à ce stade | Implémenter aux étapes 6/7 sans prétendre qu’elles fonctionnent déjà |
 | Moyen | Aucun avoir/annulation de paiement ; une erreur d’encaissement ne se corrige pas dans l’application | Définir un flux contrôlé avant usage réel, sans UPDATE silencieux des reçus |
