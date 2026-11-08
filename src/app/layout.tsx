@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import '@/styles/globals.css';
 import { messages } from '@/shared/config/messages';
+import { ServiceWorkerRegistration } from '@/shared/pwa/service-worker-registration';
 
 export const metadata: Metadata = {
   title: {
@@ -9,12 +10,27 @@ export const metadata: Metadata = {
     template: `%s · ${messages.app.name}`,
   },
   description: messages.app.tagline,
+  applicationName: messages.app.name,
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: messages.app.name,
+    statusBarStyle: 'default',
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: '/icons/apple-touch-icon.png',
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: '#0f766e',
+  colorScheme: 'light',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -28,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           {messages.common.skipToContent}
         </a>
         {children}
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );
