@@ -313,6 +313,33 @@ Un bloc SQL en lecture seule, exécuté sous le rôle `authenticated` avec des c
 
 Aucun mot de passe n’a été créé ou modifié. La connexion Auth réelle et PostgREST restent donc à tester séparément.
 
+### 8.5 Normalisation des colonnes de jeton — 7 novembre 2026
+
+Une connexion en ligne échouait en `HTTP 500 unexpected_failure` (« Database error querying schema ») pour **tout** couple identifiants/mot de passe, y compris des identifiants manifestement inexistants.
+
+Cause racine établie par lecture du code de GoTrue v2.197.0 (`internal/api/token.go`, `internal/models/user.go`), et non par une hypothèse : le modèle `models.User` déclare `confirmation_token`, `recovery_token`, `email_change_token_current`, `email_change_token_new`, `email_change`, `phone_change_token` et `reauthentication_token` comme des chaînes Go **non nullables**. Les 14 lignes `auth.users`, provisioned par insertion SQL, laissaient `email_change` (et les colonnes de jeton) à `NULL` ; le scan SQL échouait et l’erreur remontait jusqu’à `models.FindUserByEmailAndAudience`, qui renvoie alors un 500 au lieu d’un « identifiants invalides ».
+
+Action appliquée sur la base hébergée, avec l’accord explicite de l’utilisateur :
+
+```sql
+update auth.users
+set confirmation_token = coalesce(confirmation_token, ''),
+    recovery_token = coalesce(recovery_token, ''),
+    email_change_token_current = coalesce(email_change_token_current, ''),
+    email_change_token_new = coalesce(email_change_token_new, ''),
+    email_change = coalesce(email_change, ''),
+    phone_change_token = coalesce(phone_change_token, ''),
+    reauthentication_token = coalesce(reauthentication_token, '');
+```
+
+Périmètre réel : **14 lignes**, **7 colonnes de jeton**, aucune autre colonne touchée. Aucun e-mail, mot de passe, profil, rôle, école, lien parent–élève, donnée métier, politique RLS ou trigger n’a été modifié, ajouté ou supprimé. Le schéma `auth` reste inchangé : aucun objet n’y a été créé.
+
+Piste écartée : la table `auth.factors`. GoTrue v2.197.0 mappe `Factor.TableName()` sur `mfa_factors`, et le ledger `auth.schema_migrations` de la base correspond exactement à cette version (`20260831180000`). Aucune vue de compatibilité n’est donc nécessaire, et le ticket support suggéré par le rapport amont n’a pas été envoyé.
+
+Vérification après correctif : `POST /auth/v1/token?grant_type=password` répond `HTTP 200` et délivre un jeton pour le compte de démonstration. La fonction Edge de diagnostic temporaire utilisée pour cette vérification a été supprimée dans la foulée.
+
+La reproduction est assurée par `supabase/migrations/20261110000001_auth_login_compatibility.sql` et par le bloc correspondant de `supabase/seed.sql` (voir `docs/AUTHENTIFICATION.md`, section 3 bis).
+
 ## 9. Procédure avant tout environnement distant
 
 1. Obtenir une validation explicite de l’environnement cible et de la revue SQL.

@@ -186,3 +186,46 @@ insert into public.notifications (
   ('1c000000-0000-4000-8000-000000000010', '10000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000010', '11000000-0000-4000-8000-000000000001', null, 'payment_recorded', '19000000-0000-4000-8000-000000000001', 'Paiement fictif A1', 'Reçu fictif REC-DEMO-A1.', null),
   ('1c000000-0000-4000-8000-000000000011', '10000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000010', '11000000-0000-4000-8000-000000000002', null, 'payment_recorded', '19000000-0000-4000-8000-000000000002', 'Paiement fictif A2', 'Reçu fictif REC-DEMO-A2.', null),
   ('2c000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'b0000000-0000-4000-8000-000000000010', '21000000-0000-4000-8000-000000000001', '2a000000-0000-4000-8000-000000000001', 'announcement_published', '2a000000-0000-4000-8000-000000000001', 'Annonce fictive générale B', 'Notification fictive B1.', null);
+
+-- ── Compatibilité de connexion (miroir local de la migration 20261110000001) ──
+-- GoTrue charge `auth.users` dans un modèle où `email_change`,
+-- `confirmation_token`, `recovery_token`, `email_change_token_current`,
+-- `email_change_token_new`, `phone_change_token` et `reauthentication_token`
+-- sont des chaînes NON nullables. Une valeur NULL fait échouer le scan et
+-- renvoie un 500 « Database error querying schema » sur TOUTE connexion.
+-- Le bloc est conditionnel : la base de test PGlite fournit une auth.users
+-- minimale, sans ces colonnes.
+do $$
+declare
+  colonnes_jeton integer;
+begin
+  select count(*) into colonnes_jeton
+  from information_schema.columns
+  where table_schema = 'auth'
+    and table_name = 'users'
+    and column_name in (
+      'confirmation_token',
+      'recovery_token',
+      'email_change_token_current',
+      'email_change_token_new',
+      'email_change',
+      'phone_change_token',
+      'reauthentication_token'
+    );
+
+  if colonnes_jeton = 7 then
+    update auth.users
+    set confirmation_token = coalesce(confirmation_token, ''),
+        recovery_token = coalesce(recovery_token, ''),
+        email_change_token_current = coalesce(email_change_token_current, ''),
+        email_change_token_new = coalesce(email_change_token_new, ''),
+        email_change = coalesce(email_change, ''),
+        phone_change_token = coalesce(phone_change_token, ''),
+        reauthentication_token = coalesce(reauthentication_token, '');
+
+    raise notice 'Jetons de auth.users normalisés.';
+  else
+    raise notice 'Colonnes de jeton absentes de auth.users : normalisation ignorée.';
+  end if;
+end;
+$$;

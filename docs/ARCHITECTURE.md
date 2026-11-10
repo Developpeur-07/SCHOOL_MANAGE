@@ -444,6 +444,20 @@ Si la version de Lighthouse retenue ne propose plus la catégorie PWA historique
 - Le hero de l’étape 8 propose pause, indicateurs cliquables, pause au survol/toucher et respect de `prefers-reduced-motion`.
 - Formats de date et monnaie via `Intl` ; les clés de traduction ne contiennent pas de balisage arbitraire.
 
+## 11 bis. Stratégie responsive
+
+Le public des parents est majoritairement sur téléphone et tablette ; les personnels de l’école travaillent sur ordinateur. La conception est donc **mobile-first**, pas desktop-first.
+
+- **Un seul point de rupture CSS** : Tailwind v4 compile `sm` (40 rem), `md` (48 rem), `lg` (64 rem) et `xl` (80 rem). LAudit réalisé en novembre 2026 relevait un seul point de rupture (640 px) sur l’ensemble de l’application, avec une colonne unique centrée sur 512 px : le problème était de design, pas de débordement.
+- **Mobile (320–639 px)** : contenu pleine largeur, marges de 16 px, actions empilées, en-tête compact, bouton de déconnexion réduit à son icône (libellé conservé pour les lecteurs d’écran).
+- **Tablette (640–1023 px)** : grilles à 2 colonnes, cartes d’enfant côte à côte, formulaires sur une colonne centrée.
+- **Ordinateur (≥ 1024 px)** : contenu élargi à `max-w-6xl`, grilles à 3 colonnes, marges latérales de 32 px, portail école en paysage.
+- **Zones sûres** : `viewport-fit=cover` et les variables `--safe-top/right/bottom/left` alimentées par `env(safe-area-inset-*)` ; le bas de page réserve `--safe-bottom` pour ne pas masquer le contenu derrière la barre système.
+- **Aucune barre de défilement horizontale** : `overflow-x: clip` sur `body` et des grilles `min-w-0` sur les conteneurs de texte long.
+- **Saisie sans zoom iOS** : tous les champs utilisent une police de 16 px minimum (`input, select, textarea { font-size: max(1rem, 16px) }`).
+- **Cibles tactiles** : 44 px minimum sur toutes les cibles interactives, vérifié automatiquement.
+- **Tests** : `tests/e2e/responsive.spec.mjs` rejoue la matrice 320 / 360 / 390 / 768 / 1024 / 1440 px sur les pages publiques et vérifie débordement, taille des cibles, taille de police et adaptation réelle des colonnes.
+
 ## 12. Tests et qualité
 
 | Niveau | Outil proposé | Justification et périmètre |

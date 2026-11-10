@@ -5,10 +5,30 @@
     "loading": "Chargement…",
     "home": "Accueil"
   },
+  "public": {
+    "badge": "Espace familles et personnels",
+    "valueTitle": "Un écran adapté à chaque profil",
+    "valueBody": "Les parents utilisent l’application sur téléphone ou tablette ; le portail de l’école s’exploite sur les grands écrans.",
+    "devices": [
+      {
+        "title": "Téléphone",
+        "body": "L’espace parent se lit et se navigue à une main, avec des cibles tactiles larges."
+      },
+      {
+        "title": "Tablette",
+        "body": "Les listes et les tableaux restent lisibles et les actions restent à portée de doigt."
+      },
+      {
+        "title": "Ordinateur",
+        "body": "Le portail de l’école utilise la largeur de l’écran pour les vues d’ensemble."
+      }
+    ]
+  },
   "common": {
     "skipToContent": "Aller au contenu",
     "logout": "Se déconnecter",
     "logoutPending": "Déconnexion…",
+    "logoutError": "La déconnexion a échoué. Réessayez.",
     "retry": "Réessayer",
     "errorTitle": "Une erreur est survenue",
     "errorBody": "La page n’a pas pu être chargée. Vérifiez votre connexion puis réessayez.",
@@ -25,7 +45,12 @@
     "submit": "Se connecter",
     "submitPending": "Connexion…",
     "invalidCredentials": "E-mail ou mot de passe incorrect.",
-    "genericError": "Connexion impossible pour le moment. Vérifiez votre réseau et réessayez.",
+    "emailNotConfirmed": "Votre adresse e-mail n’est pas encore confirmée. Contactez votre école.",
+    "rateLimited": "Trop de tentatives de connexion. Patientez quelques minutes puis réessayez.",
+    "serviceUnavailable": "Le service de connexion est momentanément indisponible. Réessayez dans quelques instants.",
+    "networkError": "Impossible de joindre le service de connexion. Vérifiez votre connexion internet puis réessayez.",
+    "unknownError": "La connexion a échoué. Réessayez, ou contactez votre école si le problème persiste.",
+    "errorReference": "Référence technique",
     "disabledTitle": "Compte désactivé",
     "disabledBody": "Votre compte est désactivé. Contactez votre école pour vérifier votre accès."
   },

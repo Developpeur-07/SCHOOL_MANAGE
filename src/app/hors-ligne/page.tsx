@@ -9,58 +9,29 @@ export default function OfflinePage() {
   return (
     <main
       id="contenu"
-      style={{
-        minHeight: '100vh',
-        display: 'grid',
-        placeItems: 'center',
-        padding: '24px 16px',
-        background: '#f8fafc',
-        color: '#0f172a',
-        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-      }}
+      className="flex min-h-dvh items-center justify-center bg-slate-50 px-4 pt-8 pb-[calc(2rem+var(--safe-bottom))]"
     >
       <section
         aria-labelledby="offline-title"
-        style={{
-          width: '100%',
-          maxWidth: '480px',
-          padding: '32px 24px',
-          border: '1px solid #e2e8f0',
-          borderRadius: '16px',
-          background: '#ffffff',
-          textAlign: 'center',
-        }}
+        className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm sm:p-8"
       >
-        <WifiOff aria-hidden="true" size={44} style={{ color: '#0f766e', margin: '0 auto' }} />
-        <h1 id="offline-title" style={{ margin: '20px 0 0', fontSize: '28px' }}>
+        <WifiOff aria-hidden="true" className="mx-auto size-10 text-teal-700" />
+        <h1 id="offline-title" className="mt-4 text-2xl font-bold text-slate-950 sm:text-3xl">
           {messages.offline.title}
         </h1>
-        <p style={{ margin: '12px 0 0', color: '#475569', lineHeight: 1.6 }}>
-          {messages.offline.body}
-        </p>
-        <p style={{ margin: '12px 0 0', color: '#475569', lineHeight: 1.6 }}>
-          {messages.offline.privacy}
-        </p>
-        <div style={{ display: 'grid', gap: '12px', marginTop: '28px' }}>
+        <p className="mt-3 text-slate-600">{messages.offline.body}</p>
+        <p className="mt-3 text-sm text-slate-500">{messages.offline.privacy}</p>
+
+        <div className="mt-6 grid gap-3">
           <a
             href=""
-            style={{
-              minHeight: '48px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '8px',
-              background: '#0f766e',
-              color: '#ffffff',
-              fontWeight: 700,
-              textDecoration: 'none',
-            }}
+            className="inline-flex min-h-12 items-center justify-center rounded-lg bg-teal-700 px-5 py-3 font-bold text-white hover:bg-teal-800"
           >
             {messages.common.retry}
           </a>
           <Link
             href="/"
-            style={{ minHeight: '48px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#115e59' }}
+            className="inline-flex min-h-12 items-center justify-center rounded-lg px-5 py-3 font-semibold text-teal-800"
           >
             {messages.offline.home}
           </Link>

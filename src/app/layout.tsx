@@ -29,6 +29,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  // Permet d’utiliser les encoches et les barres système via env(safe-area-inset-*).
+  viewportFit: 'cover',
   themeColor: '#0f766e',
   colorScheme: 'light',
 };

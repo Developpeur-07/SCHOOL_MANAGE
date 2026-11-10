@@ -33,22 +33,25 @@ export function LogoutButton() {
   return (
     <div className="flex items-center gap-2">
       {hasError ? (
-        <span role="alert" className="text-sm font-medium text-red-700">
-          {messages.common.retry}
+        <span role="alert" className="sr-only">
+          {messages.common.logoutError}
         </span>
       ) : null}
       <button
         type="button"
         onClick={handleLogout}
         disabled={isPending}
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
+        aria-label={messages.common.logout}
+        className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
       >
         {isPending ? (
           <LoaderCircle aria-hidden="true" className="size-5 animate-spin" />
         ) : (
           <LogOut aria-hidden="true" className="size-5" />
         )}
-        <span>{isPending ? messages.common.logoutPending : messages.common.logout}</span>
+        <span className="sr-only sm:not-sr-only">
+          {isPending ? messages.common.logoutPending : messages.common.logout}
+        </span>
       </button>
     </div>
   );

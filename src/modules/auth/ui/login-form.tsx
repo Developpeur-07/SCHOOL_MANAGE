@@ -5,21 +5,39 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { messages } from '@/shared/config/messages';
 import { createSupabaseBrowserClient } from '@/shared/supabase/client';
+import { classifyLoginFailure, type LoginFailureKind } from '../domain/login-error';
 
 interface LoginFormProps {
   isConfigured: boolean;
 }
+
+const MESSAGES_PAR_KIND: Record<LoginFailureKind, string> = {
+  invalidCredentials: messages.auth.invalidCredentials,
+  emailNotConfirmed: messages.auth.emailNotConfirmed,
+  rateLimited: messages.auth.rateLimited,
+  serviceUnavailable: messages.auth.serviceUnavailable,
+  network: messages.auth.networkError,
+  unknown: messages.auth.unknownError,
+};
 
 export function LoginForm({ isConfigured }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorReference, setErrorReference] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+
+  function showFailure(kind: LoginFailureKind, reference: string): void {
+    setErrorMessage(MESSAGES_PAR_KIND[kind]);
+    setErrorReference(reference || null);
+    setIsPending(false);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage(null);
+    setErrorReference(null);
 
     if (!isConfigured) {
       setErrorMessage(messages.common.configurationBody);
@@ -35,20 +53,20 @@ export function LoginForm({ isConfigured }: LoginFormProps) {
       });
 
       if (error) {
-        setErrorMessage(
-          error.message.toLowerCase().includes('invalid login credentials')
-            ? messages.auth.invalidCredentials
-            : messages.auth.genericError,
-        );
-        setIsPending(false);
+        const failure = classifyLoginFailure(error);
+        showFailure(failure.kind, failure.reference);
         return;
       }
 
       router.replace('/compte');
       router.refresh();
-    } catch {
-      setErrorMessage(messages.auth.genericError);
-      setIsPending(false);
+    } catch (erreur) {
+      const failure = classifyLoginFailure(
+        erreur instanceof Error
+          ? { message: erreur.message, name: erreur.name }
+          : null,
+      );
+      showFailure(failure.kind, failure.reference);
     }
   }
 
@@ -92,9 +110,14 @@ export function LoginForm({ isConfigured }: LoginFormProps) {
       </div>
 
       {errorMessage ? (
-        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-800">
-          {errorMessage}
-        </p>
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm">
+          <p className="font-medium text-red-800">{errorMessage}</p>
+          {errorReference ? (
+            <p className="mt-1 text-xs text-red-700">
+              {messages.auth.errorReference} : {errorReference}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <button

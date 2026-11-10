@@ -11,17 +11,24 @@ interface AppShellProps {
   children: ReactNode;
 }
 
+/**
+ * Shell applicatif responsive.
+ *
+ * - Téléphone : barre supérieure compacte et collante, contenu pleine largeur.
+ * - Tablette et ordinateur : contenu élargi, marges et typographie plus généreux.
+ * Les zones sûres (encoches, barres système) sont respectées.
+ */
 export function AppShell({ profile, title, children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+    <div className="flex min-h-dvh flex-col bg-slate-50">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-2 sm:gap-4 sm:px-6 sm:py-3">
           <Link
             href={getRoleHomePath(profile.role)}
-            className="flex min-h-11 min-w-0 items-center gap-3 rounded-lg"
+            className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg sm:gap-3"
           >
-            <span className="rounded-lg bg-teal-700 p-2 text-white">
-              <GraduationCap aria-hidden="true" className="size-6" />
+            <span className="shrink-0 rounded-lg bg-teal-700 p-2 text-white">
+              <GraduationCap aria-hidden="true" className="size-5 sm:size-6" />
             </span>
             <span className="min-w-0">
               <span className="block truncate text-sm font-extrabold tracking-tight text-slate-950 sm:text-base">
@@ -33,8 +40,8 @@ export function AppShell({ profile, title, children }: AppShellProps) {
             </span>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-900 sm:text-sm">
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-900 sm:px-3 sm:text-sm">
               {messages.roles[profile.role]}
             </span>
             <LogoutButton />
@@ -42,11 +49,14 @@ export function AppShell({ profile, title, children }: AppShellProps) {
         </div>
       </header>
 
-      <main id="contenu" className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <h1 className="mb-6 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">
+      <main
+        id="contenu"
+        className="mx-auto w-full max-w-6xl flex-1 px-4 pt-5 pb-[calc(2rem+var(--safe-bottom))] sm:px-6 sm:pt-8 sm:pb-10 lg:px-8"
+      >
+        <h1 className="text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl lg:text-3xl">
           {title}
         </h1>
-        <div className="space-y-5">{children}</div>
+        <div className="mt-4 space-y-4 sm:mt-6 sm:space-y-5">{children}</div>
       </main>
     </div>
   );

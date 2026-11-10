@@ -19,7 +19,9 @@ export default async function ChildLayout({ children, params }: ChildLayoutProps
 
   return (
     <>
-      <ChildSelector linkedChildren={linkedChildren} currentStudentId={currentChild.id} />
+      {linkedChildren.length > 1 ? (
+        <ChildSelector linkedChildren={linkedChildren} currentStudentId={currentChild.id} />
+      ) : null}
       {children}
     </>
   );
