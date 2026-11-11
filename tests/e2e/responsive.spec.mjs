@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mesurer, verifierMiseEnPage } from './mesures.mjs';
 
 /**
  * Matrice responsive : de 320 px (petit téléphone) à 1440 px (ordinateur).
@@ -21,48 +22,6 @@ const VIEWPORTS = [
 
 const PAGES = ['/', '/connexion', '/hors-ligne'];
 
-async function mesurer(page) {
-  return page.evaluate(() => {
-    const elements = Array.from(document.querySelectorAll('a, button, input, select, textarea'));
-    const visibles = elements.filter((element) => {
-      const style = getComputedStyle(element);
-      const rect = element.getBoundingClientRect();
-      return (
-        style.display !== 'none' &&
-        style.visibility !== 'hidden' &&
-        rect.width > 0 &&
-        rect.height > 0
-      );
-    });
-
-    return {
-      largeurViewport: window.innerWidth,
-      largeurDocument: document.documentElement.scrollWidth,
-      largeurBody: document.body.scrollWidth,
-      ciblesPetites: visibles
-        .map((element) => {
-          const rect = element.getBoundingClientRect();
-          return {
-            label:
-              (element.textContent || '').trim().slice(0, 40) ||
-              element.getAttribute('aria-label') ||
-              element.id ||
-              element.tagName,
-            hauteur: Math.round(rect.height),
-            largeur: Math.round(rect.width),
-          };
-        })
-        .filter((cible) => cible.hauteur < 44),
-      policesSaisie: Array.from(document.querySelectorAll('input, select, textarea'))
-        .map((element) => ({
-          label: element.id || element.tagName,
-          taille: parseFloat(getComputedStyle(element).fontSize),
-        }))
-        .filter((champ) => champ.taille < 16),
-    };
-  });
-}
-
 for (const viewport of VIEWPORTS) {
   for (const chemin of PAGES) {
     test(`mise en page sans débordement ni cible trop petite à ${viewport.name} : ${chemin}`, async ({
@@ -72,18 +31,7 @@ for (const viewport of VIEWPORTS) {
       await page.goto(chemin, { waitUntil: 'networkidle' });
 
       const mesures = await mesurer(page);
-
-      expect(
-        mesures.largeurDocument,
-        `débordement horizontal du document (${mesures.largeurDocument} > ${mesures.largeurViewport})`,
-      ).toBeLessThanOrEqual(mesures.largeurViewport + 1);
-      expect(
-        mesures.largeurBody,
-        `débordement horizontal du body (${mesures.largeurBody} > ${mesures.largeurViewport})`,
-      ).toBeLessThanOrEqual(mesures.largeurViewport + 1);
-
-      expect(mesures.ciblesPetites, 'cibles interactives < 44 px').toEqual([]);
-      expect(mesures.policesSaisie, 'champs de saisie < 16 px').toEqual([]);
+      expect(verifierMiseEnPage(mesures)).toEqual([]);
     });
   }
 }

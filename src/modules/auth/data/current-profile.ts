@@ -18,7 +18,7 @@ async function readCurrentProfile(): Promise<UserProfile | null> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, school_id, role, full_name, is_active, schools(name)')
+    .select('id, school_id, role, full_name, is_active, schools(name, currency_code, locale)')
     .eq('id', user.id)
     .maybeSingle();
 

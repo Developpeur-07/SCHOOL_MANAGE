@@ -4,6 +4,10 @@ export interface UserProfile {
   id: string;
   schoolId: string;
   schoolName: string | null;
+  /** Devise de l’école, utilisée pour formater les montants. */
+  schoolCurrency: string;
+  /** Locale de l’école, utilisée pour formater les dates. */
+  schoolLocale: string;
   fullName: string;
   role: AppRole;
   isActive: boolean;
@@ -18,17 +22,27 @@ interface ProfileRow {
   schools: unknown;
 }
 
-function readSchoolName(value: unknown): string | null {
+function readSchool(value: unknown): {
+  name: string | null;
+  currency: string | null;
+  locale: string | null;
+} {
   const school = Array.isArray(value) ? value[0] : value;
-  if (
-    school &&
-    typeof school === 'object' &&
-    'name' in school &&
-    typeof school.name === 'string'
-  ) {
-    return school.name;
+
+  if (!school || typeof school !== 'object') {
+    return { name: null, currency: null, locale: null };
   }
-  return null;
+
+  const name =
+    'name' in school && typeof school.name === 'string' ? school.name : null;
+  const currency =
+    'currency_code' in school && typeof school.currency_code === 'string'
+      ? school.currency_code
+      : null;
+  const locale =
+    'locale' in school && typeof school.locale === 'string' ? school.locale : null;
+
+  return { name, currency, locale };
 }
 
 export function mapProfileRow(row: unknown): UserProfile | null {
@@ -45,10 +59,14 @@ export function mapProfileRow(row: unknown): UserProfile | null {
     throw new Error('PROFILE_ROW_INVALID');
   }
 
+  const school = readSchool(candidate.schools);
+
   return {
     id: candidate.id,
     schoolId: candidate.school_id,
-    schoolName: readSchoolName(candidate.schools),
+    schoolName: school.name,
+    schoolCurrency: school.currency ?? 'XAF',
+    schoolLocale: school.locale ?? 'fr-CG',
     fullName: candidate.full_name,
     role: parseAppRole(candidate.role),
     isActive: candidate.is_active,

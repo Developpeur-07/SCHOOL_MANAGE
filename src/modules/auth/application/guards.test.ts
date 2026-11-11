@@ -20,6 +20,8 @@ function makeProfile(overrides: Partial<UserProfile> = {}): UserProfile {
     id: 'a0000000-0000-4000-8000-000000000010',
     schoolId: '10000000-0000-4000-8000-000000000001',
     schoolName: 'École entièrement fictive A',
+    schoolCurrency: 'XAF',
+    schoolLocale: 'fr-CG',
     fullName: 'Parent Démo A1',
     role: 'parent',
     isActive: true,

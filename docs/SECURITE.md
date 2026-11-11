@@ -260,7 +260,7 @@ npm install
 npm run test:db
 ```
 
-Dernier résultat obtenu : **32 tests réussis, 0 échec**.
+Dernier résultat obtenu : **40 tests réussis, 0 échec** (32 historiques + 8 ajoutés à l’étape 5 pour l’espace parent : isolation multi-enfants, absence de brouillon, filtrage des annonces et notifications, refus d’écriture et de suppression, révocation d’un lien).
 
 ### 8.2 Ce que les tests prouvent dans cet environnement
 
@@ -285,7 +285,24 @@ Dernier résultat obtenu : **32 tests réussis, 0 échec**.
 - refus direct des UPDATE sur les colonnes techniques et d’identité ;
 - absence d’audit et de changement `updated_at` pour un UPDATE sans modification réelle.
 
-### 8.3 Ce qui n’a pas été testé
+### 8.3 Tests E2E et doublure Supabase locale (étape 5)
+
+Les parcours de l’espace parent sont vérifiés par Playwright
+(`tests/e2e/parent-space.spec.mjs`). Pour ne dépendre d’aucun accès réseau
+vers le projet hébergé, ils s’exécutent contre `tests/e2e/mock-supabase.mjs` :
+
+- le serveur nListening que sur `127.0.0.1` et ne contient **aucun secret** ;
+- la clé publique utilisée est une chaîne de test sans rapport avec le projet ;
+- les jetons signés sont des JWT factices signés `signature-locale`, jamais des
+  jetons Supabase ;
+- toutes les données sont fictives et locales au dépôt ;
+- le serveur ne remplace pas la base réelle : les tests RLS de la section 8.1
+  continuent de s’exécuter sur les migrations et le seed réels.
+
+La doublure n’est jamais déployée : elle vit dans `tests/e2e/` et n’est ni
+importée par l’application, ni embarquée dans le bundle.
+
+### 8.4 Ce qui n’a pas été testé
 
 - Supabase CLI, une connexion GoTrue réelle et les requêtes PostgREST de l’application ;
 - les comptes du seed avec Supabase Auth réel ;
@@ -296,7 +313,7 @@ Dernier résultat obtenu : **32 tests réussis, 0 échec**.
 
 Ces points ne doivent pas être présentés comme validés. La validation SQL hébergée ci-dessous ne remplace ni un parcours Auth réel ni les tests de l’API.
 
-### 8.4 Validation sur Supabase hébergé — 7 novembre 2026
+### 8.5 Validation sur Supabase hébergé — 7 novembre 2026
 
 Avec l’autorisation explicite de l’utilisateur, le projet unique **LIAKOLO** (`xaxwfrofmrawqojewigq`, eu-west-1) a été inspecté puis complété via le connecteur Supabase :
 
@@ -313,7 +330,7 @@ Un bloc SQL en lecture seule, exécuté sous le rôle `authenticated` avec des c
 
 Aucun mot de passe n’a été créé ou modifié. La connexion Auth réelle et PostgREST restent donc à tester séparément.
 
-### 8.5 Normalisation des colonnes de jeton — 7 novembre 2026
+### 8.6 Normalisation des colonnes de jeton — 7 novembre 2026
 
 Une connexion en ligne échouait en `HTTP 500 unexpected_failure` (« Database error querying schema ») pour **tout** couple identifiants/mot de passe, y compris des identifiants manifestement inexistants.
 
@@ -350,7 +367,7 @@ La reproduction est assurée par `supabase/migrations/20261110000001_auth_login_
 6. Sauvegarder et rédiger un plan de retour arrière avant toute migration validée.
 7. Ne jamais lancer le seed ou une migration sur la production depuis la CI de test.
 
-Aucune de ces actions distantes n’a été effectuée à l’étape 2. L’exécution hébergée autorisée ultérieurement est consignée en 8.4 ; elle ne dispense pas des sauvegardes et validations prévues pour les prochaines migrations.
+Aucune de ces actions distantes n’a été effectuée à l’étape 2. L’exécution hébergée autorisée ultérieurement est consignée en 8.5 ; elle ne dispense pas des sauvegardes et validations prévues pour les prochaines migrations.
 
 ## 10. Risques restants
 

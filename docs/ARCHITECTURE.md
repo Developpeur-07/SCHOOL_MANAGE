@@ -106,7 +106,7 @@ Les modules d’acteurs composent des capacités métier partagées. Cela évite
 | Module | Responsabilités principales | Étape de livraison |
 | --- | --- | --- |
 | `auth` | Connexion, déconnexion, session, rôle actif, redirection et garde de layout | 3 |
-| `parent` | Sélecteur d’enfant, cinq onglets en lecture seule, centre de notifications | 3 puis 5 et 7 |
+| `parent` | Sélecteur d’enfant, cinq onglets en lecture seule, centre de notifications | 3 puis 5 (livré) et 7 |
 | `school` | Coquille du portail direction/secrétariat/comptable et navigation selon les droits | 3 puis 6 |
 | `teacher` | Coquille enseignant/surveillant et accès aux saisies autorisées | 3 puis 6 |
 | `students` | Référentiel élève, classe et liens avec les tuteurs | 2 ; interfaces seulement si prévues dans une étape validée |
@@ -119,6 +119,9 @@ Les modules d’acteurs composent des capacités métier partagées. Cela évite
 | `public-home` | Hero public à cinq scènes et contrôles d’animation | 8 |
 
 ### 4.1 Module parent
+
+Le détail de l’espace parent livré à l’étape 5 (routes, règles de lecture,
+états, tests) est documenté dans `docs/ESPACE-PARENT.md`.
 
 - Un parent peut consulter plusieurs enfants et un élève peut avoir plusieurs tuteurs autorisés.
 - L’enfant sélectionné fait partie de l’URL afin que le partage, le rafraîchissement et le cache ne mélangent pas les enfants.
@@ -241,6 +244,9 @@ SCHOOL_MANAGE/
 │       └── ci.yml                         # Vérifications automatisées, après le socle
 ├── docs/
 │   ├── ARCHITECTURE.md                    # Étape 1
+│   ├── AUTHENTICATION.md                  # Étape 3
+│   ├── PWA.md                             # Étape 4
+│   ├── ESPACE-PARENT.md                   # Étape 5
 │   └── SECURITE.md                        # Étape 2
 ├── public/
 │   ├── icons/                             # Icônes PWA et maskables — étape 4
@@ -258,14 +264,17 @@ SCHOOL_MANAGE/
 │   │   └── (authenticated)/
 │   │       ├── layout.tsx                 # Session et garde commune — étape 3
 │   │       ├── parent/
-│   │       │   ├── page.tsx               # Redirection vers un enfant autorisé
+│   │       │   ├── page.tsx               # Sélecteur d’enfant — étape 5
+│   │       │   ├── not-found.tsx          # Enfant non rattaché — étape 5
 │   │       │   ├── notifications/
 │   │       │   │   └── page.tsx           # Centre personnel — étape 7
 │   │       │   └── [studentId]/
-│   │       │       ├── layout.tsx         # Sélecteur d’enfant et onglets
-│   │       │       ├── page.tsx           # Redirection vers Résumé
-│   │       │       ├── resume/page.tsx
-│   │       │       ├── resultats/page.tsx
+│   │       │       ├── layout.tsx         # Sélecteur d’enfant et onglets — étape 5
+│   │       │       ├── page.tsx           # Résumé — étape 5
+│   │       │       ├── loading.tsx        # Squelette de chargement — étape 5
+│   │       │       ├── error.tsx          # Erreur et reprise — étape 5
+│   │       │       ├── not-found.tsx      # Enfant non rattaché — étape 5
+│   │       │       ├── resultats/page.tsx # Résultats — étape 5
 │   │       │       ├── vie-scolaire/page.tsx
 │   │       │       ├── paiements/page.tsx
 │   │       │       └── infos/page.tsx
@@ -305,7 +314,7 @@ SCHOOL_MANAGE/
 │   │   │   ├── server.ts                  # Client serveur, JWT utilisateur
 │   │   │   └── database.types.ts          # Types générés, jamais édités à la main
 │   │   ├── ui/                            # Primitives accessibles et états communs
-│   │   ├── formatting/                    # Dates, nombres et monnaie via Intl
+│   │   ├── format/                        # Dates, nombres et monnaie via Intl — étape 5
 │   │   └── observability/                 # Erreurs sans données scolaires sensibles
 │   ├── messages/
 │   │   └── fr.json                        # Libellés français, préparation i18n
@@ -319,10 +328,12 @@ SCHOOL_MANAGE/
 │   └── functions/
 │       └── dispatch-notifications/        # Edge Function Web Push — étape 7
 ├── tests/
-│   ├── unit/                              # Règles pures et permissions fonctionnelles
-│   ├── integration/                       # Adaptateurs et parcours Supabase locaux
-│   ├── e2e/                               # Parcours critiques Playwright
-│   └── accessibility/                     # Contrôles clavier, noms et contrastes
+│   └── e2e/                               # Parcours critiques Playwright
+│       ├── mock-supabase.mjs              # Serveur Supabase local de test — étape 5
+│       ├── mesures.mjs                    # Mesures responsive partagées
+│       ├── parent-space.spec.mjs          # Espace parent — étape 5
+│       ├── pwa.spec.mjs
+│       └── responsive.spec.mjs
 ├── .env.example                           # Noms uniquement, aucune valeur secrète
 ├── package.json
 ├── README.md                              # Installation et déploiement — étape 9
@@ -462,14 +473,17 @@ Le public des parents est majoritairement sur téléphone et tablette ; les pers
 
 | Niveau | Outil proposé | Justification et périmètre |
 | --- | --- | --- |
-| SQL/RLS | PGlite + `node:test` à l’étape 2 ; Supabase CLI local et/ou pgTAP avant tout environnement distant | PostgreSQL réel sans Docker pour commencer, puis validation Supabase obligatoire ; accès refusés et cohérence des tenants |
-| Domaine | Vitest | Tests rapides des règles pures, cibles, montants et permissions fonctionnelles |
-| Composants | Testing Library + Vitest | Labels, états et interactions sans surtester l’implémentation |
-| Parcours | Playwright | Connexion, sélection d’enfant, saisies et notifications sur navigateurs ciblés |
+| SQL/RLS | PGlite + `node:test` (étapes 2 et 5) | PostgreSQL réel en WASM, migrations et seed réels ; accès refusés et cohérence des tenants |
+| Domaine | Vitest (étapes 3 et 5) | Tests rapides des règles pures, cibles, montants et permissions fonctionnelles |
+| Composants | Vitest sur le domaine, rendu vérifié par Playwright | Pas de bibliothèque de rendu supplémentaire à ce stade ; les états sont contrôlés dans les parcours |
+| Parcours | Playwright (étapes 4 et 5) | Connexion, navigation parent, états d’erreur et responsive sur les cinq onglets |
+| Doublure Supabase | `tests/e2e/mock-supabase.mjs` (étape 5) | Permet de parcourir l’espace parent connecté sans accès au projet hébergé ; données fictives |
 | Accessibilité | Playwright, vérifications clavier et audit automatisé complété manuellement | Un outil automatique seul ne prouve ni le focus ni la compréhension |
 | PWA/performance | Build de production, Lighthouse et tests manuels hors ligne | Vérification du SW réel, pas seulement du serveur de développement |
 
 Les outils de test sont des dépendances de développement justifiées par les étapes 2 et 9 ; ils ne sont pas embarqués dans le bundle utilisateur. La CI devra exécuter les vérifications adaptées à chaque étape, sans secrets de production et avec Supabase local.
+
+État au terme de l’étape 5 : `npm run test:unit` (95), `npm run test:db` (40) et `npm run test:e2e` (68) passent ; `npm run lint`, `npm run typecheck` et `npm run build` ne signalent aucune erreur.
 
 ### Jeu minimal de tests de sécurité attendu
 
@@ -505,7 +519,7 @@ Chaque ligne est une porte de validation : l’étape suivante ne commence qu’
 | **2 — Base et sécurité** | Migrations des 15 tables demandées, RLS, contraintes, audit, seeds fictifs, tests SQL, `docs/SECURITE.md` | Tests locaux inter-parents/inter-écoles réussis ; aucune migration destructive ni action production |
 | **3 — Auth et rôles** | Supabase Auth email/mot de passe, téléphone seulement si réalisable sans dérive, redirections, trois layouts, sélecteur d’enfant | Rôle non modifiable côté client, routes protégées, aucun contenu métier anticipé |
 | **4 — Socle PWA** | Manifeste, icônes maskables, installation, SW, caches SWR, indicateur hors ligne, base 360 px | Build de production testé, coupure réseau vérifiée, aucun cache inter-comptes, audit Lighthouse honnête |
-| **5 — Écrans parent** | Résumé, Résultats, Vie scolaire, Paiements, Infos ; états complets et lecture RLS | Parent multi-enfants sans fuite, lecture seule, petits écrans et réseau lent testés |
+| **5 — Écrans parent** | Résumé, Résultats, Vie scolaire, Paiements, Infos ; états complets et lecture RLS — **livré, voir `docs/ESPACE-PARENT.md`** | Parent multi-enfants sans fuite, lecture seule, petits écrans et réseau lent testés |
 | **6 — Portail école** | Saisies notes/présences, paiements et reçus, annonces aux quatre cibles, accusés de lecture, audit | Permissions par rôle testées, aucune notification prématurée, chaque action tracée |
 | **7 — Notifications** | Abonnement Web Push, distribution Edge, centre lu/non lu, contrat de repli SMS/WhatsApp non implémenté | Payloads minimaux, destinataires exacts, désabonnement et échecs traités, aucun envoi SMS/WhatsApp |
 | **8 — Accueil animé** | Hero public de cinq scènes, mockups SVG/CSS/Motion et contrôles accessibles | Rotation 4–5 s, pause, indicateurs, stagger, reduced motion, transform/opacity uniquement |
