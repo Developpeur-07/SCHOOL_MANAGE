@@ -649,12 +649,6 @@ function decodeJwtPayload(token) {
   }
 }
 
-function accountFor(userId) {
-  return (
-    Object.values(ACCOUNTS).find((account) => account.userId === userId) ?? null
-  );
-}
-
 function emailFor(userId) {
   for (const [email, account] of Object.entries(ACCOUNTS)) {
     if (account.userId === userId) return email;
