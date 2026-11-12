@@ -60,6 +60,7 @@ Un seul projet Next.js App Router héberge :
 - l’espace parent ;
 - le portail école ;
 - l’espace enseignant/surveillant ;
+- la supervision globale du management ;
 - le service worker, le manifeste et les endpoints Web Push nécessaires.
 
 Il n’y a ni monorepo ni microservice en V1. Cette simplicité réduit les déploiements, la consommation et les surfaces de sécurité.
@@ -115,6 +116,7 @@ Les modules d’acteurs composent des capacités métier partagées. Cela évite
 | `payments` | Frais, solde d’un élève, encaissement manuel et reçu non-PDF | 2, 5 et 6 |
 | `announcements` | Ciblage, publication, diffusion et accusé de lecture | 2, 5, 6 et 7 |
 | `notifications` | Préférences techniques, abonnement push, centre lu/non lu et repli à brancher | 7 |
+| `supervision` | Vue d’ensemble globale du management : totaux par école, répartition des comptes, totaux financiers par devise | 6 (livré) |
 | `pwa` | Manifeste, installation, service worker, caches et indicateur hors ligne | 4 |
 | `public-home` | Hero public à cinq scènes et contrôles d’animation | 8 |
 
@@ -151,6 +153,22 @@ La RLS applique ces distinctions en base. Masquer un bouton n’est jamais consi
 - Listes paginées ou limitées à une classe afin d’éviter l’envoi de centaines de lignes sur un réseau faible.
 - En l’absence d’une table d’affectation enseignant–classe dans la liste V1 imposée, aucune affectation fine ne sera simulée côté client. Ce manque est signalé comme limite à trancher lors de l’étape 2 ; l’étendue par défaut doit rester la plus restrictive possible.
 
+### 4.4 Module supervision
+
+La supervision globale du management est livrée à l’étape 6. Son détail
+(routes, rôle, isolation, tests) figure dans `docs/SUPERVISION.md`.
+
+- Le rôle `super_admin` est transverse : il n’appartient à aucune école et suit
+  l’ensemble des écoles de la plateforme.
+- La page `/supervision` est une vue d’ensemble **consultative** : elle
+  n’écrit rien et n’ajoute aucune capacité de gestion métier.
+- Trois barrières Protègent l’accès : le routage applicatif (`requireArea`),
+  les politiques RLS de lecture seule, et le helper interne `is_super_admin()`.
+- Les autres rôles conservent strictement leur périmètre : une école ne voit
+  que la sienne, un parent que ses enfants liés.
+- Les montants ne sont jamais cumulés entre devises : les totaux financiers
+  sont regroupés par devise.
+
 ## 5. Modèle de données et cohérence multi-tenant
 
 Le détail SQL et les politiques seront produits à l’étape 2, mais l’architecture fixe les invariants suivants.
@@ -179,6 +197,10 @@ Le détail SQL et les politiques seront produits à l’étape 2, mais l’archi
 - Le personnel est limité à `profiles.school_id` ; un `school_id` envoyé par le navigateur n’est jamais une preuve.
 - Le contenu de `audit_log` n’est ni modifiable ni supprimable par les rôles applicatifs.
 - Les tests de l’étape 2 doivent prouver les refus de lecture **et d’écriture**, entre parents et entre deux écoles.
+- Exception explicite et bornée : le rôle `super_admin` de l’étape 6 dispose
+  de politiques de **lecture seule** sur toutes les tables. Il est transverse
+  (`profiles.school_id` nul), ne peut rien écrire, et sa désactivation coupe
+  immédiatement son accès.
 
 ### 5.3 Hypothèse de tenant V1
 
@@ -247,6 +269,7 @@ SCHOOL_MANAGE/
 │   ├── AUTHENTICATION.md                  # Étape 3
 │   ├── PWA.md                             # Étape 4
 │   ├── ESPACE-PARENT.md                   # Étape 5
+│   ├── SUPERVISION.md                     # Étape 6
 │   └── SECURITE.md                        # Étape 2
 ├── public/
 │   ├── icons/                             # Icônes PWA et maskables — étape 4
@@ -285,11 +308,14 @@ SCHOOL_MANAGE/
 │   │       │   ├── presences/page.tsx
 │   │       │   ├── paiements/page.tsx
 │   │       │   └── annonces/page.tsx
-│   │       └── enseignant/
-│   │           ├── layout.tsx
-│   │           ├── page.tsx
-│   │           ├── notes/page.tsx
-│   │           └── presences/page.tsx
+│   │       ├── enseignant/
+│   │       │   ├── layout.tsx
+│   │       │   ├── page.tsx
+│   │       │   ├── notes/page.tsx
+│   │       │   └── presences/page.tsx
+│   │       └── supervision/
+│   │           ├── layout.tsx              # Zone admin, garde de rôle — étape 6
+│   │           └── page.tsx               # Vue d'ensemble globale — étape 6
 │   ├── modules/
 │   │   ├── auth/
 │   │   │   ├── application/
@@ -299,6 +325,7 @@ SCHOOL_MANAGE/
 │   │   ├── parent/
 │   │   ├── school/
 │   │   ├── teacher/
+│   │   ├── super-admin/                   # Supervision globale — étape 6
 │   │   ├── students/
 │   │   ├── grades/
 │   │   ├── attendance/
@@ -332,6 +359,7 @@ SCHOOL_MANAGE/
 │       ├── mock-supabase.mjs              # Serveur Supabase local de test — étape 5
 │       ├── mesures.mjs                    # Mesures responsive partagées
 │       ├── parent-space.spec.mjs          # Espace parent — étape 5
+│       ├── supervision.spec.mjs           # Supervision globale — étape 6
 │       ├── pwa.spec.mjs
 │       └── responsive.spec.mjs
 ├── .env.example                           # Noms uniquement, aucune valeur secrète
@@ -343,7 +371,7 @@ SCHOOL_MANAGE/
 ### Règles de dépendances entre dossiers
 
 - `app` peut composer `modules` et `shared`, mais ne contient pas les règles métier.
-- Un module d’acteur (`parent`, `school`, `teacher`) peut utiliser les cas d’usage des modules métier.
+- Un module d’acteur (`parent`, `school`, `teacher`, `super-admin`) peut utiliser les cas d’usage des modules métier.
 - Un module métier ne dépend pas d’un module d’acteur ni d’un composant de page.
 - `domain` ne dépend ni de `data`, ni de `ui`, ni de Next.js.
 - Les imports partagés passent par des points d’entrée explicites ; aucun import circulaire entre modules.

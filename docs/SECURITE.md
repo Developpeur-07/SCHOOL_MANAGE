@@ -60,6 +60,13 @@ Aucune application Next.js, interface, Edge Function, notification push ou fonct
 | `accountant` | Comptable |
 | `teacher` | Enseignant |
 | `supervisor` | Surveillant |
+| `super_admin` | Supervision globale de la plateforme, transverse : sans école |
+
+Le rôle `super_admin` n’appartient à aucune école (`profiles.school_id` est
+nul, ce que la contrainte `profiles_school_required_unless_super_admin`
+impose pour tout autre rôle). Il dispose de politiques de **lecture seule**
+sur les 15 tables : aucune politique `INSERT`, `UPDATE` ou `DELETE` ne le
+concerne, et le détail figure dans `docs/SUPERVISION.md`.
 
 Les privilèges SQL et la RLS sont cumulatifs : une politique seule ne suffit pas si le privilège de table/colonne est absent, et un privilège seul ne donne aucune ligne sans politique.
 
@@ -162,11 +169,19 @@ Les opérations du seed ont un `actor_id` nul. Le journal ne conserve ni contenu
 
 ## 5. Fonctions internes et absence de contournement applicatif
 
-Trois fonctions utilisent `SECURITY DEFINER` pour éviter une récursion de politique sur `profiles` ou écrire l’audit :
+Quatre fonctions utilisent `SECURITY DEFINER` pour éviter une récursion de politique sur `profiles` ou écrire l’audit :
 
 - `is_school_member(uuid)` ;
 - `has_school_role(uuid, app_role[])` ;
+- `is_super_admin()` ;
 - `audit_business_change()`.
+
+`is_super_admin()` ne lit que le profil de l’utilisateur du JWT et exige le
+rôle `super_admin` **actif** : c’est la seule porte d’entrée des 15
+politiques `*_select_super_admin`. Comme les autres helpers, il relit les
+claims publics de la requête (`request.jwt.claim.sub`) au lieu de dépendre du
+schéma `auth`, dont les privilèges ne sont pas garantis par Supabase
+hébergé.
 
 Leur propriétaire est le rôle dédié `school_manage_internal` avec :
 
@@ -285,7 +300,24 @@ Dernier résultat obtenu : **40 tests réussis, 0 échec** (32 historiques + 8 a
 - refus direct des UPDATE sur les colonnes techniques et d’identité ;
 - absence d’audit et de changement `updated_at` pour un UPDATE sans modification réelle.
 
-### 8.3 Tests E2E et doublure Supabase locale (étape 5)
+### 8.3 Supervision globale (étape 6)
+
+La suite `supabase/tests/supervision.test.mjs` (7 tests) vérifie au niveau de
+la base :
+
+- le profil de supervision globale n’appartient à aucune école, et la
+  contrainte interdit l’absence d’école pour tout autre rôle ;
+- la supervision lit les deux écoles, tous les élèves, toutes les notes
+  (brouillons compris), les liens tuteurs, les frais, les paiements, les
+  annonces et les notifications ;
+- elle ne peut rien écrire : insertions refusées, mise à jour sans effet,
+  suppression refusée ;
+- l’isolation des autres rôles est inchangée : une direction ne voit que sa
+  école, un parent que ses enfants liés ;
+- `is_super_admin()` ne répond `true` que pour le rôle de supervision actif ;
+- la désactivation du profil coupe immédiatement tous les accès.
+
+### 8.4 Tests E2E et doublure Supabase locale (étape 5)
 
 Les parcours de l’espace parent sont vérifiés par Playwright
 (`tests/e2e/parent-space.spec.mjs`). Pour ne dépendre d’aucun accès réseau
@@ -302,7 +334,7 @@ vers le projet hébergé, ils s’exécutent contre `tests/e2e/mock-supabase.mjs
 La doublure n’est jamais déployée : elle vit dans `tests/e2e/` et n’est ni
 importée par l’application, ni embarquée dans le bundle.
 
-### 8.4 Ce qui n’a pas été testé
+### 8.5 Ce qui n’a pas été testé
 
 - Supabase CLI, une connexion GoTrue réelle et les requêtes PostgREST de l’application ;
 - les comptes du seed avec Supabase Auth réel ;
@@ -313,7 +345,7 @@ importée par l’application, ni embarquée dans le bundle.
 
 Ces points ne doivent pas être présentés comme validés. La validation SQL hébergée ci-dessous ne remplace ni un parcours Auth réel ni les tests de l’API.
 
-### 8.5 Validation sur Supabase hébergé — 7 novembre 2026
+### 8.6 Validation sur Supabase hébergé — 7 novembre 2026
 
 Avec l’autorisation explicite de l’utilisateur, le projet unique **LIAKOLO** (`xaxwfrofmrawqojewigq`, eu-west-1) a été inspecté puis complété via le connecteur Supabase :
 
@@ -330,7 +362,7 @@ Un bloc SQL en lecture seule, exécuté sous le rôle `authenticated` avec des c
 
 Aucun mot de passe n’a été créé ou modifié. La connexion Auth réelle et PostgREST restent donc à tester séparément.
 
-### 8.6 Normalisation des colonnes de jeton — 7 novembre 2026
+### 8.7 Normalisation des colonnes de jeton — 7 novembre 2026
 
 Une connexion en ligne échouait en `HTTP 500 unexpected_failure` (« Database error querying schema ») pour **tout** couple identifiants/mot de passe, y compris des identifiants manifestement inexistants.
 

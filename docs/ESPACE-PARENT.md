@@ -16,7 +16,7 @@ saisie appartiennent au portail école (étape 6).
 | --- | --- | --- |
 | `/parent` | — | Redirection vers l’unique enfant, sinon sélecteur d’enfant |
 | `/parent/[studentId]` | Résumé | Moyenne, assiduité, reste à payer, dernières notes, dernières présences, dernières infos |
-| `/parent/[studentId]/resultats` | Résultats | Notes publiées, regroupées par matière, avec la moyenne pondérée |
+| `/parent/[studentId]/resultats` | Résultats | Notes publiées, regroupées par matière, avec la moyenne sur 20 |
 | `/parent/[studentId]/vie-scolaire` | Vie scolaire | Présences/absences/retards, taux de présence, commentaires de l’école |
 | `/parent/[studentId]/paiements` | Paiements | Frais, reste à payer, règlements, numéros de reçu et mode de règlement |
 | `/parent/[studentId]/infos` | Infos | Annonces publiées et notifications personnelles |
@@ -96,6 +96,17 @@ l’internationalisation.
 
 ## 5. Formatage
 
+- **La moyenne générale est une note sur 20**, selon le système scolaire
+  français : elle est affichée « Moyenne générale » et valorisée `14,5 / 20`.
+  Ce n’est ni un pourcentage, ni une moyenne sur 100.
+  - Chaque note est ramenée sur 20 avant calcul : une évaluation sur 10
+    (`8/10`) ou sur 50 (`45/50`) devient `16/20` et `18/20`, ce qui rend les
+    moyennes comparables entre barèmes différents.
+  - La moyenne est une moyenne arithmétique : aucun coefficient n’existe en
+    V1, toutes les évaluations ont le même poids.
+  - Le calcul est porté par `convertNoteToOutOfTwenty` et
+    `computeAverageOnTwenty` (`src/modules/parent/domain/grades.ts`), avec un
+    arrondi à une décimale.
 - Les montants utilisent la devise de l’école (`schools.currency_code`) et le
   nombre de décimales de cette devise (`XAF` → 0, `EUR` → 2).
 - Les dates civiles sont interprétées en UTC afin d’éviter un décalage d’un
@@ -106,10 +117,11 @@ l’internationalisation.
 
 | Niveau | Fichier | Couverture |
 | --- | --- | --- |
-| Unité | `src/modules/parent/domain/*.test.ts` | mapping strict des lignes, pourcentages, moyennes, regroupement par matière, synthèse des présences, application des règlements, filtrage des brouillons, segments d’URL |
+| Unité | `src/modules/parent/domain/*.test.ts` | mapping strict des lignes, conversion des notes sur 20, moyennes sur 20, regroupement par matière, synthèse des présences, application des règlements, filtrage des brouillons, segments d’URL |
 | Unité | `src/shared/format/format.test.ts` | formatage monétaire selon la devise, formatage des dates |
 | RLS (PGlite) | `supabase/tests/parent-space.test.mjs` | isolation multi-enfants, absence de brouillon, filtrage annonces/notifications, refus d’écriture et de suppression, révocation d’un lien |
 | RLS (PGlite) | `supabase/tests/rls.test.mjs` | non-régression des politiques existantes |
+| RLS (PGlite) | `supabase/tests/supervision.test.mjs` | non-régression de l’isolation des rôles (voir `docs/SUPERVISION.md`) |
 | E2E (Playwright) | `tests/e2e/parent-space.spec.mjs` | connexion, navigation entre les cinq onglets, URL liée à l’enfant, refus d’un enfant non rattaché, absence de fuite inter-enfants, absence de contrôle d’écriture, état d’erreur et reprise, audit responsive 320→1440 px sur les cinq onglets |
 
 ### Serveur Supabase de test
@@ -129,9 +141,9 @@ elle-même, et pas seulement s’appuyer sur la RLS.
 ```bash
 npm run lint        # ESLint, aucune erreur ni avertissement
 npm run typecheck   # TypeScript strict
-npm run test:unit   # 95 tests
-npm run test:db     # 40 tests RLS (PGlite + migrations réelles)
-npm run test:e2e    # 68 tests Playwright
+npm run test:unit   # 106 tests
+npm run test:db     # 47 tests RLS (PGlite + migrations réelles)
+npm run test:e2e    # 74 tests Playwright
 npm run build       # build de production
 ```
 
@@ -148,3 +160,5 @@ aucun champ de saisie sous 16 px.
   navigation ; il fait partie du centre de notifications de l’étape 7.
 - Les received/paiements affichent le mode de règlement et le numéro de reçu,
   mais aucun reçu téléchargeable (exclu de la V1).
+- La moyenne générale ne pondère pas les évaluations : aucun coefficient
+  n’est saisi par l’école en V1.
