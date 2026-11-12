@@ -5,10 +5,11 @@ export const APP_ROLES = [
   'accountant',
   'teacher',
   'supervisor',
+  'super_admin',
 ] as const;
 
 export type AppRole = (typeof APP_ROLES)[number];
-export type RoleArea = 'parent' | 'school' | 'teacher';
+export type RoleArea = 'parent' | 'school' | 'teacher' | 'admin';
 
 const ROLE_AREAS: Record<AppRole, RoleArea> = {
   parent: 'parent',
@@ -17,6 +18,7 @@ const ROLE_AREAS: Record<AppRole, RoleArea> = {
   accountant: 'school',
   teacher: 'teacher',
   supervisor: 'teacher',
+  super_admin: 'admin',
 };
 
 const ROLE_HOME_PATHS: Record<AppRole, string> = {
@@ -26,6 +28,7 @@ const ROLE_HOME_PATHS: Record<AppRole, string> = {
   accountant: '/ecole',
   teacher: '/enseignant',
   supervisor: '/enseignant',
+  super_admin: '/supervision',
 };
 
 export function parseAppRole(value: unknown): AppRole {
@@ -46,4 +49,14 @@ export function getRoleHomePath(role: AppRole): string {
 
 export function canAccessArea(role: AppRole, area: RoleArea): boolean {
   return getRoleArea(role) === area;
+}
+
+/**
+ * Rôle de supervision globale.
+ *
+ * Ce rôle n’appartient à aucune école : il consulte l’ensemble des écoles
+ * gérées par la plateforme. Toute autre valeur de rôle est refusée.
+ */
+export function isSuperAdmin(role: AppRole): boolean {
+  return role === 'super_admin';
 }

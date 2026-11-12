@@ -23,10 +23,17 @@ import { createServer } from 'node:http';
 
 const DEMO_EMAIL = 'parent.demo@example.invalid';
 const DEMO_PASSWORD = 'SchoolDemo2026!Parent';
+const SUPERVISION_EMAIL = 'supervision.demo@example.invalid';
+const SUPERVISION_PASSWORD = 'SchoolDemo2026!Supervision';
+const DIRECTION_EMAIL = 'direction.demo@example.invalid';
+const DIRECTION_PASSWORD = 'SchoolDemo2026!Direction';
 
 const SCHOOL_ID = '10000000-0000-4000-8000-000000000001';
+const OTHER_SCHOOL_ID = '10000000-0000-4000-8000-000000000002';
 const PARENT_ID = 'a0000000-0000-4000-8000-000000000010';
 const OTHER_PARENT_ID = 'a0000000-0000-4000-8000-000000000012';
+const DIRECTION_ID = 'a0000000-0000-4000-8000-000000000020';
+const SUPERVISION_ID = 'c0000000-0000-4000-8000-000000000001';
 const STUDENT_A1 = '11000000-0000-4000-8000-000000000001';
 const STUDENT_A2 = '11000000-0000-4000-8000-000000000002';
 const STUDENT_A3 = '11000000-0000-4000-8000-000000000003';
@@ -38,6 +45,28 @@ export const DEMO_CREDENTIALS = Object.freeze({
   password: DEMO_PASSWORD,
 });
 
+export const SUPERVISION_CREDENTIALS = Object.freeze({
+  email: SUPERVISION_EMAIL,
+  password: SUPERVISION_PASSWORD,
+});
+
+export const DIRECTION_CREDENTIALS = Object.freeze({
+  email: DIRECTION_EMAIL,
+  password: DIRECTION_PASSWORD,
+});
+
+/**
+ * Comptes acceptés par le serveur de test.
+ *
+ * Chaque compte est rattaché à un rôle : c'est ce rôle qui pilote la
+ * restitution des données, comme le ferait la RLS en production.
+ */
+const ACCOUNTS = {
+  [DEMO_EMAIL]: { password: DEMO_PASSWORD, userId: PARENT_ID },
+  [SUPERVISION_EMAIL]: { password: SUPERVISION_PASSWORD, userId: SUPERVISION_ID },
+  [DIRECTION_EMAIL]: { password: DIRECTION_PASSWORD, userId: DIRECTION_ID },
+};
+
 const TABLES = {
   schools: [
     {
@@ -45,6 +74,12 @@ const TABLES = {
       name: 'École Démo Fictive',
       currency_code: 'XAF',
       locale: 'fr-CG',
+    },
+    {
+      id: OTHER_SCHOOL_ID,
+      name: 'École Démo Fictive B',
+      currency_code: 'EUR',
+      locale: 'fr-FR',
     },
   ],
   profiles: [
@@ -62,10 +97,33 @@ const TABLES = {
       full_name: 'Autre Parent Fictif',
       is_active: true,
     },
+    {
+      id: DIRECTION_ID,
+      school_id: SCHOOL_ID,
+      role: 'direction',
+      full_name: 'Direction Démo Fictive',
+      is_active: true,
+    },
+    {
+      // Compte de supervision globale : il n'appartient à aucune école.
+      id: SUPERVISION_ID,
+      school_id: null,
+      role: 'super_admin',
+      full_name: 'Supervision Démo Fictive',
+      is_active: true,
+    },
+    {
+      id: 'a0000000-0000-4000-8000-000000000021',
+      school_id: OTHER_SCHOOL_ID,
+      role: 'teacher',
+      full_name: 'Enseignant Démo B',
+      is_active: true,
+    },
   ],
   classes: [
     { id: '12000000-0000-4000-8000-000000000001', school_id: SCHOOL_ID, name: '6ème A' },
     { id: '12000000-0000-4000-8000-000000000002', school_id: SCHOOL_ID, name: '5ème B' },
+    { id: '12000000-0000-4000-8000-000000000003', school_id: OTHER_SCHOOL_ID, name: '4ème B' },
   ],
   students: [
     {
@@ -91,6 +149,14 @@ const TABLES = {
       student_code: 'ELEVE-DEMO-A3',
       first_name: 'Enfant',
       last_name: 'Démo A3',
+    },
+    {
+      id: '11000000-0000-4000-8000-000000000004',
+      school_id: OTHER_SCHOOL_ID,
+      class_id: '12000000-0000-4000-8000-000000000003',
+      student_code: 'ELEVE-DEMO-B1',
+      first_name: 'Enfant',
+      last_name: 'Démo B1',
     },
     {
       id: STUDENT_ERROR,
@@ -193,6 +259,18 @@ const TABLES = {
       published_at: '2026-11-03T09:00:00Z',
     },
     {
+      id: '16000000-0000-4000-8000-00000000000b',
+      school_id: OTHER_SCHOOL_ID,
+      student_id: '11000000-0000-4000-8000-000000000004',
+      subject_id: '13000000-0000-4000-8000-000000000003',
+      period_id: '14000000-0000-4000-8000-000000000003',
+      evaluation_label: 'Devoir fictif B1',
+      score: 15,
+      max_score: 20,
+      status: 'published',
+      published_at: '2026-11-05T09:00:00Z',
+    },
+    {
       id: '16000000-0000-4000-8000-000000000009',
       school_id: SCHOOL_ID,
       student_id: STUDENT_A3,
@@ -246,6 +324,14 @@ const TABLES = {
       status: 'absent',
       comment: 'Donnée d’un autre enfant',
     },
+    {
+      id: '17000000-0000-4000-8000-000000000006',
+      school_id: OTHER_SCHOOL_ID,
+      student_id: '11000000-0000-4000-8000-000000000004',
+      attendance_date: '2026-11-06',
+      status: 'present',
+      comment: null,
+    },
   ],
   fees: [
     {
@@ -272,6 +358,14 @@ const TABLES = {
       amount_minor: 70000,
       due_on: '2026-11-01',
     },
+    {
+      id: '18000000-0000-4000-8000-000000000004',
+      school_id: OTHER_SCHOOL_ID,
+      student_id: '11000000-0000-4000-8000-000000000004',
+      label: 'Frais de scolarité B1',
+      amount_minor: 45000,
+      due_on: '2026-11-01',
+    },
   ],
   payments: [
     {
@@ -295,6 +389,17 @@ const TABLES = {
       payment_method: 'bank_transfer',
       receipt_number: 'REC-DEMO-A2',
       note: 'Paiement fictif complet',
+    },
+    {
+      id: '19000000-0000-4000-8000-000000000003',
+      school_id: OTHER_SCHOOL_ID,
+      fee_id: '18000000-0000-4000-8000-000000000004',
+      student_id: '11000000-0000-4000-8000-000000000004',
+      amount_minor: 20000,
+      paid_at: '2026-11-02T11:00:00Z',
+      payment_method: 'cash',
+      receipt_number: 'REC-DEMO-B1',
+      note: 'Paiement fictif partiel',
     },
   ],
   announcements: [
@@ -321,6 +426,14 @@ const TABLES = {
       body: 'Brouillon qui ne doit jamais être visible.',
       status: 'draft',
       published_at: null,
+    },
+    {
+      id: '1a000000-0000-4000-8000-000000000006',
+      school_id: OTHER_SCHOOL_ID,
+      title: 'Réunion de rentrée fictive B',
+      body: 'Contenu entièrement fictif pour l’école B.',
+      status: 'published',
+      published_at: '2026-11-01T08:00:00Z',
     },
   ],
   notifications: [
@@ -359,6 +472,18 @@ const TABLES = {
       body: 'Notification fictive ciblée sur A1.',
       read_at: null,
       created_at: '2026-11-04T08:00:00Z',
+    },
+    {
+      id: '1c000000-0000-4000-8000-000000000005',
+      school_id: OTHER_SCHOOL_ID,
+      recipient_id: 'a0000000-0000-4000-8000-000000000021',
+      student_id: '11000000-0000-4000-8000-000000000004',
+      announcement_id: '1a000000-0000-4000-8000-000000000006',
+      event_type: 'announcement_published',
+      title: 'Réunion de rentrée fictive B',
+      body: 'Notification fictive pour l’école B.',
+      read_at: null,
+      created_at: '2026-11-01T08:00:00Z',
     },
     {
       id: '1c000000-0000-4000-8000-000000000004',
@@ -524,6 +649,19 @@ function decodeJwtPayload(token) {
   }
 }
 
+function accountFor(userId) {
+  return (
+    Object.values(ACCOUNTS).find((account) => account.userId === userId) ?? null
+  );
+}
+
+function emailFor(userId) {
+  for (const [email, account] of Object.entries(ACCOUNTS)) {
+    if (account.userId === userId) return email;
+  }
+  return DEMO_EMAIL;
+}
+
 function buildAccessToken(userId) {
   const now = Math.floor(Date.now() / 1000);
   const header = base64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
@@ -532,13 +670,23 @@ function buildAccessToken(userId) {
       sub: userId,
       aud: 'authenticated',
       role: 'authenticated',
-      email: DEMO_EMAIL,
+      email: emailFor(userId),
       session_id: 'local-e2e-session',
       iat: now,
       exp: now + 3600,
     }),
   );
   return `${header}.${payload}.signature-locale`;
+}
+
+/** Jeton de rafraîchissement : il porte l'identifiant du compte connecté. */
+function buildRefreshToken(userId) {
+  return `local-e2e-refresh-token:${userId}`;
+}
+
+function userIdFromRefreshToken(token) {
+  const parts = String(token ?? '').split(':');
+  return parts.length === 2 ? parts[1] : null;
 }
 
 function buildUser(userId, email) {
@@ -595,29 +743,62 @@ function linkedStudentIds(userId) {
 }
 
 /**
- * Filtre les notifications comme le ferait la RLS : destinataire connecté et
- * enfant réellement lié.
+ * Émulation de la RLS d'après le rôle du compte connecté.
+ *
+ *  - la supervision globale lit toutes les écoles ;
+ *  - un parent ne lit que ses enfants liés ;
+ *  - un rôle d'école ne lit que sa propre école.
  */
 function applyRls(table, rows, userId) {
-  if (table === 'notifications') {
+  const profile = (TABLES.profiles ?? []).find((candidate) => candidate.id === userId);
+  if (!profile) return [];
+
+  // La supervision globale n'appartient à aucune école : elle lit tout.
+  if (profile.role === 'super_admin') return rows;
+
+  if (profile.role === 'parent') {
     const allowed = new Set(linkedStudentIds(userId));
+
+    if (table === 'notifications') {
+      return rows.filter(
+        (row) => row.recipient_id === userId && allowed.has(row.student_id),
+      );
+    }
+    if (table === 'announcements') {
+      const targeted = new Set(
+        TABLES.notifications
+          .filter(
+            (notification) =>
+              notification.recipient_id === userId && allowed.has(notification.student_id),
+          )
+          .map((notification) => notification.announcement_id),
+      );
+      return rows.filter((announcement) => targeted.has(announcement.id));
+    }
+    if (table === 'guardian_links') {
+      return rows.filter((row) => row.guardian_id === userId);
+    }
+    if (table === 'students') {
+      return rows.filter((row) => allowed.has(row.id));
+    }
     return rows.filter(
-      (row) => row.recipient_id === userId && allowed.has(row.student_id),
+      (row) => row.student_id === undefined || allowed.has(row.student_id),
     );
   }
-  if (table === 'announcements') {
-    const allowed = new Set(linkedStudentIds(userId));
-    const targeted = new Set(
-      TABLES.notifications
-        .filter(
-          (notification) =>
-            notification.recipient_id === userId && allowed.has(notification.student_id),
-        )
-        .map((notification) => notification.announcement_id),
+
+  // Rôles d'école : périmètre strictement limité à leur école.
+  const schoolId = profile.school_id;
+  if (table === 'schools') return rows.filter((row) => row.id === schoolId);
+  if (table === 'profiles') {
+    return rows.filter(
+      (row) =>
+        row.id === userId ||
+        (row.school_id === schoolId &&
+          ['direction', 'secretary', 'accountant'].includes(row.role)),
     );
-    return rows.filter((announcement) => targeted.has(announcement.id));
   }
-  return rows;
+  if (table === 'audit_log') return [];
+  return rows.filter((row) => row.school_id === schoolId);
 }
 
 export function createMockSupabaseServer() {
@@ -643,10 +824,8 @@ export function createMockSupabaseServer() {
       const body = await readBody(request);
       const grantType = url.searchParams.get('grant_type');
       if (grantType === 'password') {
-        if (
-          body.email !== DEMO_EMAIL ||
-          body.password !== DEMO_PASSWORD
-        ) {
+        const account = ACCOUNTS[body.email];
+        if (!account || account.password !== body.password) {
           json(response, 400, {
             error: 'invalid_credentials',
             error_description: 'Invalid login credentials',
@@ -654,23 +833,28 @@ export function createMockSupabaseServer() {
           return;
         }
         json(response, 200, {
-          access_token: buildAccessToken(PARENT_ID),
+          access_token: buildAccessToken(account.userId),
           token_type: 'bearer',
           expires_in: 3600,
           expires_at: Math.floor(Date.now() / 1000) + 3600,
-          refresh_token: 'local-e2e-refresh-token',
-          user: buildUser(PARENT_ID, DEMO_EMAIL),
+          refresh_token: buildRefreshToken(account.userId),
+          user: buildUser(account.userId, body.email),
         });
         return;
       }
       if (grantType === 'refresh_token') {
+        const refreshedId = userIdFromRefreshToken(body.refresh_token);
+        if (!refreshedId) {
+          json(response, 400, { error: 'invalid_grant' });
+          return;
+        }
         json(response, 200, {
-          access_token: buildAccessToken(PARENT_ID),
+          access_token: buildAccessToken(refreshedId),
           token_type: 'bearer',
           expires_in: 3600,
           expires_at: Math.floor(Date.now() / 1000) + 3600,
-          refresh_token: 'local-e2e-refresh-token',
-          user: buildUser(PARENT_ID, DEMO_EMAIL),
+          refresh_token: buildRefreshToken(refreshedId),
+          user: buildUser(refreshedId, emailFor(refreshedId)),
         });
         return;
       }
@@ -683,7 +867,7 @@ export function createMockSupabaseServer() {
         json(response, 401, { error: 'invalid_token' });
         return;
       }
-      json(response, 200, buildUser(userId, DEMO_EMAIL));
+      json(response, 200, buildUser(userId, emailFor(userId)));
       return;
     }
 

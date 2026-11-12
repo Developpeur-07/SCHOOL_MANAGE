@@ -51,6 +51,27 @@ describe('mapProfileRow', () => {
     expect(mapProfileRow({ ...baseRow, is_active: false })?.isActive).toBe(false);
   });
 
+  it('accepte un profil de supervision globale sans école', () => {
+    const profile = mapProfileRow({
+      ...baseRow,
+      school_id: null,
+      role: 'super_admin',
+      schools: null,
+    });
+
+    expect(profile?.role).toBe('super_admin');
+    expect(profile?.schoolId).toBeNull();
+    expect(profile?.schoolName).toBeNull();
+    expect(profile?.schoolCurrency).toBe('XAF');
+    expect(profile?.schoolLocale).toBe('fr-CG');
+  });
+
+  it('refuse une école absente pour un rôle d’école', () => {
+    expect(() => mapProfileRow({ ...baseRow, school_id: null })).toThrow(
+      'PROFILE_ROW_INVALID',
+    );
+  });
+
   it('retourne null sans profil, mais refuse une ligne malformée', () => {
     expect(mapProfileRow(null)).toBeNull();
     expect(() => mapProfileRow({ ...baseRow, id: 42 })).toThrow('PROFILE_ROW_INVALID');

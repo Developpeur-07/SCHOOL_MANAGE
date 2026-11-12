@@ -1,7 +1,7 @@
 import { GraduationCap } from 'lucide-react';
 import { requireChildAccess } from '@/modules/parent/application/child-context';
 import { getChildGrades } from '@/modules/parent/data/child-grades.supabase';
-import { computeAveragePercentage, groupGradesBySubject } from '@/modules/parent/domain/grades';
+import { computeAverageOnTwenty, groupGradesBySubject } from '@/modules/parent/domain/grades';
 import { EmptyState } from '@/modules/parent/ui/empty-state';
 import { messages } from '@/shared/config/messages';
 import { formatShortDate } from '@/shared/format/date';
@@ -16,7 +16,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
 
   const grades = await getChildGrades(child.id, 100);
   const groups = groupGradesBySubject(grades);
-  const average = computeAveragePercentage(grades);
+  const average = computeAverageOnTwenty(grades);
   const childName = `${child.firstName} ${child.lastName}`;
 
   return (
@@ -41,7 +41,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
               {messages.parent.results.average}
             </h2>
             <p className="mt-1 text-3xl font-extrabold text-slate-950">
-              {average === null ? '—' : `${average.toFixed(1)} %`}
+              {average === null ? '—' : `${average.toFixed(1)} / 20`}
             </p>
           </section>
 
@@ -60,7 +60,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
                 </h2>
                 <p className="text-sm font-semibold text-slate-600">
                   {messages.parent.results.average} :{' '}
-                  {group.average === null ? '—' : `${group.average.toFixed(1)} %`}
+                  {group.average === null ? '—' : `${group.average.toFixed(1)} / 20`}
                 </p>
               </div>
 
@@ -73,9 +73,6 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
                       </span>
                       <span className="shrink-0 text-sm font-bold text-slate-950">
                         {grade.score}/{grade.maxScore}
-                        <span className="ml-2 font-semibold text-slate-500">
-                          {grade.percentage.toFixed(1)} %
-                        </span>
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">

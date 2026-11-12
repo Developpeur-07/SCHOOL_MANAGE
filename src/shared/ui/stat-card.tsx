@@ -7,7 +7,7 @@ interface StatCardProps {
   icon?: ReactNode;
 }
 
-/** Indicateur compact utilisé dans le résumé et les onglets. */
+/** Indicateur compact utilisé dans les résumés et les tableaux de bord. */
 export function StatCard({ label, value, detail, icon }: StatCardProps) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">

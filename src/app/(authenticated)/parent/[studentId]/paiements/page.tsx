@@ -3,7 +3,7 @@ import { requireChildAccess } from '@/modules/parent/application/child-context';
 import { getChildFees, getChildPayments } from '@/modules/parent/data/child-finance.supabase';
 import { applyPaymentsToFees, summarizeFinance } from '@/modules/parent/domain/finance';
 import { EmptyState } from '@/modules/parent/ui/empty-state';
-import { StatCard } from '@/modules/parent/ui/stat-card';
+import { StatCard } from '@/shared/ui/stat-card';
 import { messages } from '@/shared/config/messages';
 import { formatSchoolDate } from '@/shared/format/date';
 import { formatMinorAmount } from '@/shared/format/money';

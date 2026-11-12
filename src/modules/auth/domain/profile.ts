@@ -1,8 +1,15 @@
-import { parseAppRole, type AppRole } from './roles';
+import { isSuperAdmin, parseAppRole, type AppRole } from './roles';
 
 export interface UserProfile {
   id: string;
-  schoolId: string;
+  /**
+   * École de rattachement.
+   *
+   * `null` pour le rôle de supervision globale, qui n’appartient à aucune
+   * école : c’est la RLS, et non l’interface, qui garantit qu’aucun autre
+   * rôle ne peut lire les données d’une autre école.
+   */
+  schoolId: string | null;
   schoolName: string | null;
   /** Devise de l’école, utilisée pour formater les montants. */
   schoolCurrency: string;
@@ -52,23 +59,38 @@ export function mapProfileRow(row: unknown): UserProfile | null {
   const candidate = row as ProfileRow;
   if (
     typeof candidate.id !== 'string' ||
-    typeof candidate.school_id !== 'string' ||
     typeof candidate.full_name !== 'string' ||
     typeof candidate.is_active !== 'boolean'
   ) {
     throw new Error('PROFILE_ROW_INVALID');
   }
 
+  const role = parseAppRole(candidate.role);
+
+  // Le rôle de supervision globale n’est rattaché à aucune école : son
+  // `school_id` peut donc être absent. Tout autre rôle exige une école.
+  const schoolId = readSchoolId(candidate.school_id, role);
+
   const school = readSchool(candidate.schools);
 
   return {
     id: candidate.id,
-    schoolId: candidate.school_id,
+    schoolId,
     schoolName: school.name,
     schoolCurrency: school.currency ?? 'XAF',
     schoolLocale: school.locale ?? 'fr-CG',
     fullName: candidate.full_name,
-    role: parseAppRole(candidate.role),
+    role,
     isActive: candidate.is_active,
   };
+}
+
+function readSchoolId(value: unknown, role: AppRole): string | null {
+  if (typeof value === 'string') return value;
+  if (value === null || value === undefined) {
+    if (isSuperAdmin(role)) return null;
+    throw new Error('PROFILE_ROW_INVALID');
+  }
+
+  throw new Error('PROFILE_ROW_INVALID');
 }

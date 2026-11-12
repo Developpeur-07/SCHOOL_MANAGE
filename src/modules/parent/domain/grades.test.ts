@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  computePercentage,
-  computeAveragePercentage,
+  computeAverageOnTwenty,
+  convertNoteToOutOfTwenty,
   filterPublishedGrades,
   groupGradesBySubject,
   mapGradeRow,
@@ -27,7 +27,7 @@ describe('mapGradeRow', () => {
       evaluationLabel: 'Devoir fictif A1',
       score: 14.5,
       maxScore: 20,
-      percentage: 72.5,
+      noteOutOfTwenty: 14.5,
       publishedAt: '2026-11-02T08:00:00Z',
     });
   });
@@ -57,16 +57,22 @@ describe('mapGradeRow', () => {
   });
 });
 
-describe('computePercentage', () => {
-  it('arrondit à une décimale', () => {
-    expect(computePercentage(14.5, 20)).toBe(72.5);
-    expect(computePercentage(1, 3)).toBe(33.3);
-    expect(computePercentage(0, 20)).toBe(0);
-    expect(computePercentage(20, 20)).toBe(100);
+describe('convertNoteToOutOfTwenty', () => {
+  it('conserve une note déjà sur 20', () => {
+    expect(convertNoteToOutOfTwenty(14.5, 20)).toBe(14.5);
+    expect(convertNoteToOutOfTwenty(0, 20)).toBe(0);
+    expect(convertNoteToOutOfTwenty(20, 20)).toBe(20);
   });
 
-  it('refuse un barème nul', () => {
-    expect(() => computePercentage(1, 0)).toThrow('GRADE_MAX_SCORE_INVALID');
+  it('ramène une note sur 10 ou sur 50 sur l’échelle de 20', () => {
+    expect(convertNoteToOutOfTwenty(8, 10)).toBe(16);
+    expect(convertNoteToOutOfTwenty(45, 50)).toBe(18);
+    expect(convertNoteToOutOfTwenty(1, 3)).toBe(6.7);
+  });
+
+  it('refuse un barème nul ou une note hors barème', () => {
+    expect(() => convertNoteToOutOfTwenty(1, 0)).toThrow('GRADE_MAX_SCORE_INVALID');
+    expect(() => convertNoteToOutOfTwenty(21, 20)).toThrow('GRADE_MAX_SCORE_INVALID_RANGE');
   });
 });
 
@@ -77,7 +83,7 @@ const buildGrade = (overrides: Partial<ParentGrade>): ParentGrade => ({
   evaluationLabel: 'Évaluation',
   score: 10,
   maxScore: 20,
-  percentage: 50,
+  noteOutOfTwenty: 10,
   publishedAt: null,
   ...overrides,
 });
@@ -95,27 +101,35 @@ describe('filterPublishedGrades', () => {
   });
 });
 
-describe('computeAveragePercentage', () => {
-  it('pondère par le barème et exprime le résultat en pourcentage', () => {
-    const average = computeAveragePercentage([
-      buildGrade({ score: 10, maxScore: 20 }),
-      buildGrade({ score: 18, maxScore: 20 }),
-      buildGrade({ score: 45, maxScore: 50 }),
+describe('computeAverageOnTwenty', () => {
+  it('calcule la moyenne générale sur 20', () => {
+    const average = computeAverageOnTwenty([
+      buildGrade({ score: 14.5, maxScore: 20, noteOutOfTwenty: 14.5 }),
+      buildGrade({ score: 12, maxScore: 20, noteOutOfTwenty: 12 }),
+      buildGrade({ score: 16, maxScore: 20, noteOutOfTwenty: 16 }),
     ]);
-    expect(average).toBe(81.1);
+    expect(average).toBe(14.2);
+  });
+
+  it('ramène sur 20 les évaluations de barèmes différents', () => {
+    const average = computeAverageOnTwenty([
+      buildGrade({ score: 14.5, maxScore: 20, noteOutOfTwenty: 14.5 }),
+      buildGrade({ score: 8, maxScore: 10, noteOutOfTwenty: 16 }),
+    ]);
+    expect(average).toBe(15.3);
   });
 
   it('renvoie null sans note', () => {
-    expect(computeAveragePercentage([])).toBeNull();
+    expect(computeAverageOnTwenty([])).toBeNull();
   });
 });
 
 describe('groupGradesBySubject', () => {
   it('regroupe par matière en conservant l’ordre d’arrivée', () => {
     const groups = groupGradesBySubject([
-      buildGrade({ id: '1', subjectName: 'Mathématiques', score: 10, maxScore: 20 }),
-      buildGrade({ id: '2', subjectName: 'Lecture', score: 15, maxScore: 20 }),
-      buildGrade({ id: '3', subjectName: 'Mathématiques', score: 18, maxScore: 20 }),
+      buildGrade({ id: '1', subjectName: 'Mathématiques', score: 10, maxScore: 20, noteOutOfTwenty: 10 }),
+      buildGrade({ id: '2', subjectName: 'Lecture', score: 15, maxScore: 20, noteOutOfTwenty: 15 }),
+      buildGrade({ id: '3', subjectName: 'Mathématiques', score: 18, maxScore: 20, noteOutOfTwenty: 18 }),
     ]);
 
     expect(groups.map((group) => group.subjectName)).toEqual([
@@ -123,6 +137,6 @@ describe('groupGradesBySubject', () => {
       'Lecture',
     ]);
     expect(groups[0].grades).toHaveLength(2);
-    expect(groups[0].average).toBe(70);
+    expect(groups[0].average).toBe(14);
   });
 });

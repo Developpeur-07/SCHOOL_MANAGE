@@ -1,8 +1,11 @@
 /**
- * Lecture des notes publiées d’un enfant (lecture seule côté parent).
+ * Lecture des notes publiées d'un enfant (lecture seule côté parent).
  *
  * Le mapping est volontairement strict : une ligne inattendue lève une erreur
- * explicite plutôt que d’afficher une donnée partielle ou trompeuse.
+ * explicite plutôt que d'afficher une donnée partielle ou trompeuse.
+ *
+ * Les moyennes suivent le système scolaire français : la note est ramenée sur
+ * 20 et la moyenne est exprimée sur 20 (pas de coefficient en V1).
  */
 
 export interface ParentGrade {
@@ -12,8 +15,8 @@ export interface ParentGrade {
   evaluationLabel: string;
   score: number;
   maxScore: number;
-  /** Pourcentage arrondi à une décimale, compris entre 0 et 100. */
-  percentage: number;
+  /** Note ramenée sur 20 (système français), arrondie à une décimale. */
+  noteOutOfTwenty: number;
   publishedAt: string | null;
 }
 
@@ -31,7 +34,7 @@ function readNumber(value: unknown, field: string): number {
   return value;
 }
 
-/** PostgREST renvoie une relation imbriquée sous forme d’objet ou de tableau. */
+/** PostgREST renvoie une relation imbriquée sous forme d'objet ou de tableau. */
 export function readEmbeddedName(value: unknown, field: string): string {
   const relation = Array.isArray(value) ? value[0] : value;
 
@@ -48,15 +51,22 @@ export function readEmbeddedName(value: unknown, field: string): string {
   return relation.name;
 }
 
-export function computePercentage(score: number, maxScore: number): number {
+/**
+ * Ramène une note sur l'échelle française de 20.
+ *
+ * Une note sur 10 ou sur 50 est convertie : 8/10 vaut 16/20. C'est ce qui
+ * rend les moyennes comparables entre évaluations de barèmes différents.
+ */
+export function convertNoteToOutOfTwenty(score: number, maxScore: number): number {
   if (maxScore <= 0) throw new Error('GRADE_MAX_SCORE_INVALID');
-  const percentage = (score / maxScore) * 100;
-  return Math.round(percentage * 10) / 10;
+  if (score < 0 || score > maxScore) throw new Error('GRADE_MAX_SCORE_INVALID_RANGE');
+
+  const note = (score / maxScore) * 20;
+  return Math.round(note * 10) / 10;
 }
 
 export function mapGradeRow(row: unknown): ParentGrade {
   if (!row || typeof row !== 'object') throw new Error('GRADE_ROW_INVALID');
-
   const grade = row as Record<string, unknown>;
 
   if (!('id' in grade) || !('score' in grade) || !('max_score' in grade)) {
@@ -82,7 +92,7 @@ export function mapGradeRow(row: unknown): ParentGrade {
     evaluationLabel: readString(grade.evaluation_label, 'EVALUATION_LABEL'),
     score,
     maxScore,
-    percentage: computePercentage(score, maxScore),
+    noteOutOfTwenty: convertNoteToOutOfTwenty(score, maxScore),
     publishedAt,
   };
 }
@@ -90,33 +100,28 @@ export function mapGradeRow(row: unknown): ParentGrade {
 /**
  * Ne conserve que les notes effectivement publiées.
  *
- * La RLS réserve déjà les notes publiées aux parents, mais l’interface
+ * La RLS réserve déjà les notes publiées aux parents, mais l'interface
  * applique ce filtre une seconde fois : une évolution de politique ne peut
- * pas exposer un brouillon dans l’espace parent.
+ * pas exposer un brouillon dans l'espace parent.
  */
 export function filterPublishedGrades(grades: ParentGrade[]): ParentGrade[] {
   return grades.filter((grade) => typeof grade.publishedAt === 'string' && grade.publishedAt.length > 0);
 }
 
 /**
- * Moyenne pondérée par le barème, exprimée en pourcentage et arrondie à une
- * décimale. Les notes ayant des barèmes différents (sur 10, sur 20, sur 50),
- * seul un ratio comparable est affiché.
+ * Moyenne générale sur 20, système français.
+ *
+ * Chaque note est ramenée sur 20 puis la moyenne arithmétique est calculée.
+ * Aucun coefficient n'existe en V1 : toutes les évaluations ont le même poids.
  */
-export function computeAveragePercentage(grades: ParentGrade[]): number | null {
-  const total = grades.reduce(
-    (accumulator, grade) => ({
-      max: accumulator.max + grade.maxScore,
-      score: accumulator.score + grade.score,
-    }),
-    { max: 0, score: 0 },
-  );
+export function computeAverageOnTwenty(grades: ParentGrade[]): number | null {
+  if (grades.length === 0) return null;
 
-  if (total.max === 0) return null;
-  return Math.round((total.score / total.max) * 1000) / 10;
+  const total = grades.reduce((accumulator, grade) => accumulator + grade.noteOutOfTwenty, 0);
+  return Math.round((total / grades.length) * 10) / 10;
 }
 
-/** Regroupe les notes par matière, dans l’ordre d’apparition. */
+/** Regroupe les notes par matière, dans l'ordre d'apparition. */
 export function groupGradesBySubject(
   grades: ParentGrade[],
 ): Array<{ subjectName: string; grades: ParentGrade[]; average: number | null }> {
@@ -131,6 +136,6 @@ export function groupGradesBySubject(
   return Array.from(groups.entries()).map(([subjectName, subjectGrades]) => ({
     subjectName,
     grades: subjectGrades,
-    average: computeAveragePercentage(subjectGrades),
+    average: computeAverageOnTwenty(subjectGrades),
   }));
 }

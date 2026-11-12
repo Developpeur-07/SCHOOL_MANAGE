@@ -53,6 +53,8 @@ select pg_temp.seed_auth_user('b0000000-0000-4000-8000-000000000001', 'direction
 select pg_temp.seed_auth_user('b0000000-0000-4000-8000-000000000003', 'comptable.b@example.invalid', 'Comptable Démo B');
 select pg_temp.seed_auth_user('b0000000-0000-4000-8000-000000000004', 'enseignant.b@example.invalid', 'Enseignant Démo B');
 select pg_temp.seed_auth_user('b0000000-0000-4000-8000-000000000010', 'parent.b1@example.invalid', 'Parent Démo B1');
+-- Compte de supervision globale : il n'appartient à aucune école.
+select pg_temp.seed_auth_user('c0000000-0000-4000-8000-000000000001', 'supervision@example.invalid', 'Supervision Démo');
 
 insert into public.schools (id, name, slug, timezone, locale, currency_code) values
   ('10000000-0000-4000-8000-000000000001', 'École entièrement fictive A', 'ecole-fictive-a', 'Africa/Brazzaville', 'fr-CG', 'XAF'),
@@ -71,7 +73,8 @@ insert into public.profiles (id, school_id, role, full_name, phone) values
   ('b0000000-0000-4000-8000-000000000001', '20000000-0000-4000-8000-000000000002', 'direction', 'Direction Démo B', '+242070000001'),
   ('b0000000-0000-4000-8000-000000000003', '20000000-0000-4000-8000-000000000002', 'accountant', 'Comptable Démo B', '+242070000003'),
   ('b0000000-0000-4000-8000-000000000004', '20000000-0000-4000-8000-000000000002', 'teacher', 'Enseignant Démo B', '+242070000004'),
-  ('b0000000-0000-4000-8000-000000000010', '20000000-0000-4000-8000-000000000002', 'parent', 'Parent Démo B1', '+242070000010');
+  ('b0000000-0000-4000-8000-000000000010', '20000000-0000-4000-8000-000000000002', 'parent', 'Parent Démo B1', '+242070000010'),
+  ('c0000000-0000-4000-8000-000000000001', null, 'super_admin', 'Supervision Démo', null);
 
 insert into public.classes (id, school_id, school_year, name, level) values
   ('12000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001', '2026-2027', 'Classe Démo A1', 'Sixième fictive'),

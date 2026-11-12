@@ -60,7 +60,8 @@
     "secretary": "Secrétariat",
     "accountant": "Comptable",
     "teacher": "Enseignant",
-    "supervisor": "Surveillant"
+    "supervisor": "Surveillant",
+    "super_admin": "Super-admin"
   },
   "parent": {
     "title": "Espace parent",
@@ -99,7 +100,8 @@
       "noAttendance": "Aucune présence enregistrée pour le moment.",
       "noFees": "Aucun frais enregistré pour le moment.",
       "noNews": "Aucune information publiée pour le moment.",
-      "average": "Moyenne",
+      "average": "Moyenne générale",
+      "averageScale": "sur 20",
       "presenceRate": "Jours présents",
       "balance": "Reste à payer",
       "childrenCount": "Enfants suivis"
@@ -111,7 +113,7 @@
       "period": "Période",
       "evaluation": "Évaluation",
       "score": "Note",
-      "average": "Moyenne pondérée",
+      "average": "Moyenne générale",
       "empty": "Aucune note n’a encore été publiée pour {studentName}.",
       "emptyHint": "Les notes apparaissent dès que l’école les publie."
     },
@@ -178,6 +180,39 @@
   "teacher": {
     "title": "Espace enseignant",
     "readyBody": "Votre accès est actif. Les outils de saisie seront ajoutés à l’étape 6, selon votre rôle."
+  },
+  "supervision": {
+    "title": "Supervision globale",
+    "intro": "Vue d’ensemble de toutes les écoles gérées par la plateforme.",
+    "readOnlyNotice": "Consultation seule : la supervision ne crée ni ne modifie aucune donnée.",
+    "schools": "Écoles supervisées",
+    "students": "Élèves",
+    "staff": "Personnel",
+    "parents": "Parents",
+    "classes": "Classes",
+    "publishedGrades": "Notes publiées",
+    "attendance": "Présences",
+    "outstandingFees": "Frais non soldés",
+    "schoolsWithOutstanding": "Écoles avec impayé",
+    "announcements": "Annonces publiées",
+    "notifications": "Notifications",
+    "schoolsTitle": "Écoles",
+    "schoolColumn": "École",
+    "currencyColumn": "Devise",
+    "studentsColumn": "Élèves",
+    "staffColumn": "Personnel",
+    "parentsColumn": "Parents",
+    "classesColumn": "Classes",
+    "gradesColumn": "Notes publiées",
+    "outstandingColumn": "Impayés",
+    "announcementsColumn": "Annonces",
+    "notificationsColumn": "Notifications",
+    "rolesTitle": "Répartition des comptes",
+    "currenciesTitle": "Totaux financiers par devise",
+    "outstandingTotal": "Reste à recouvrer",
+    "collectedTotal": "Encaissé",
+    "noSchool": "Aucune école enregistrée.",
+    "partialNotice": "Vue partielle : les volumes de données dépassent la limite de lecture."
   },
   "offline": {
     "title": "Vous êtes hors ligne",

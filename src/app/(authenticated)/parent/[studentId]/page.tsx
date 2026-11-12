@@ -5,12 +5,12 @@ import { getChildAnnouncements } from '@/modules/parent/data/child-announcements
 import { getChildAttendance } from '@/modules/parent/data/child-attendance.supabase';
 import { getChildFees, getChildPayments } from '@/modules/parent/data/child-finance.supabase';
 import { getChildGrades } from '@/modules/parent/data/child-grades.supabase';
-import { computeAveragePercentage } from '@/modules/parent/domain/grades';
+import { computeAverageOnTwenty } from '@/modules/parent/domain/grades';
 import { summarizeAttendance } from '@/modules/parent/domain/attendance';
 import { applyPaymentsToFees, summarizeFinance } from '@/modules/parent/domain/finance';
 import { getParentTabHref } from '@/modules/parent/domain/tabs';
 import { EmptyState } from '@/modules/parent/ui/empty-state';
-import { StatCard } from '@/modules/parent/ui/stat-card';
+import { StatCard } from '@/shared/ui/stat-card';
 import { messages } from '@/shared/config/messages';
 import { formatShortDate } from '@/shared/format/date';
 import { formatMinorAmount } from '@/shared/format/money';
@@ -31,7 +31,7 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
     getChildAnnouncements(20),
   ]);
 
-  const average = computeAveragePercentage(grades);
+  const average = computeAverageOnTwenty(grades);
   const attendanceSummary = summarizeAttendance(attendance);
   const feesWithStatus = applyPaymentsToFees(fees, payments);
   const financeSummary = summarizeFinance(
@@ -54,7 +54,7 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
 
         <StatCard
           label={messages.parent.resume.average}
-          value={average === null ? '—' : `${average.toFixed(1)} %`}
+          value={average === null ? '—' : `${average.toFixed(1)} / 20`}
           detail={messages.parent.resume.latestGrades}
           icon={<GraduationCap aria-hidden="true" className="size-5" />}
         />
