@@ -128,6 +128,11 @@ export interface SupervisionOverview {
   totals: SupervisionTotals;
   roles: SupervisionRoleBreakdown[];
   /**
+   * Vrai lorsqu'une lecture a atteint la limite de lignes : les agrégats
+   * sont alors partiels et la vue doit être présentée comme telle.
+   */
+  truncated: boolean;
+  /**
    * Totaux financiers regroupés par devise.
    *
    * Les écoles peuvent utiliser des devises différentes : aucun montant n'est
@@ -176,6 +181,7 @@ function emptySchool(school: SupervisionSchoolRow): SupervisionSchool {
 export function buildSupervisionOverview(
   input: SupervisionInput,
   today: string,
+  truncated = false,
 ): SupervisionOverview {
   const schools = new Map<string, SupervisionSchool>();
   for (const school of input.schools) {
@@ -312,6 +318,7 @@ export function buildSupervisionOverview(
     schools: schoolList,
     totals,
     roles,
+    truncated,
     currencies: Array.from(currencies.values()).sort((left, right) =>
       left.currencyCode.localeCompare(right.currencyCode),
     ),

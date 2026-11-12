@@ -194,8 +194,12 @@ async function readSupervisionOverview(): Promise<SupervisionOverview> {
     notifications: (notificationsResult.data ?? []).map(mapNotificationRow),
   };
 
+  // Une lecture qui atteint la limite signifie que l'agrégat est partiel :
+  // la vue le signale au lieu de se présenter comme exhaustive.
+  const truncated = results.some((result) => (result.data ?? []).length >= limit);
+
   const today = new Date().toISOString().slice(0, 10);
-  return buildSupervisionOverview(input, today);
+  return buildSupervisionOverview(input, today, truncated);
 }
 
 // Dédoublonne les lectures de la page de supervision et de son squelette.

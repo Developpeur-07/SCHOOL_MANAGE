@@ -16,7 +16,7 @@ import { StatCard } from '@/shared/ui/stat-card';
 export default async function SupervisionPage() {
   await requireSupervisionAccess();
   const overview = await getSupervisionOverview();
-  const { totals, schools, roles, currencies } = overview;
+  const { totals, schools, roles, currencies, truncated } = overview;
 
   return (
     <div className="space-y-5">
@@ -25,6 +25,12 @@ export default async function SupervisionPage() {
       <p className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
         {messages.supervision.readOnlyNotice}
       </p>
+
+      {truncated ? (
+        <p className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {messages.supervision.partialNotice}
+        </p>
+      ) : null}
 
       <section
         aria-labelledby="supervision-totaux"

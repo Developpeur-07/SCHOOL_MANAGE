@@ -166,5 +166,11 @@ describe('buildSupervisionOverview', () => {
     expect(overview.schools).toEqual([]);
     expect(overview.totals.schoolsCount).toBe(0);
     expect(overview.currencies).toEqual([]);
+    expect(overview.truncated).toBe(false);
+  });
+
+  it('signale une vue partielle quand une lecture est tronquée', () => {
+    const overview = buildSupervisionOverview(buildInput(), '2026-11-07', true);
+    expect(overview.truncated).toBe(true);
   });
 });
