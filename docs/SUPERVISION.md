@@ -99,9 +99,10 @@ Les lectures passent par `src/modules/super-admin/data/supervision.supabase.ts`
 Supabase ni React.
 
 Chaque table est lue avec une limite de 10 000 lignes
-(`SUPERVISION_ROW_LIMIT`). Au-delà, la vue est signalée comme partielle plutôt
-que présentée comme exhaustive : l’agrégat reste exact tant que la limite
-n’est pas atteinte.
+(`SUPERVISION_ROW_LIMIT`). L’agrégat reste exact tant que la limite n’est pas
+atteinte ; dès qu’une lecture l’atteint, l’agrégat est marqué comme
+partiel (`truncated`) et la page affiche un avertissement, plutôt que de
+présenter des totaux incomplets comme exhaustifs.
 
 ## 6. Provisionnement d’un compte de supervision
 
@@ -154,8 +155,9 @@ lit que ses enfants liés, un rôle d’école ne lit que sa école.
 
 - La supervision est une **vue d’ensemble** : pas de détail par élève, pas
   d’historique, pas d’export.
-- Les lectures sont bornées à 10 000 lignes par table ; au-delà, la vue doit
-  être considérée comme partielle.
+- Les lectures sont bornées à 10 000 lignes par table ; au-delà, la page
+  affiche un avertissement explicite de **vue partielle**, pour ne pas
+  présenter des totaux incomplets comme exhaustifs.
 - Les agrégats sont calculés en mémoire par l’application : à grande échelle,
   une vue matérialisée ou une fonction SQL de supervision serait plus
   performante.
