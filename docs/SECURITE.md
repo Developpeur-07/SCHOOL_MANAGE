@@ -62,9 +62,11 @@ Aucune application Next.js, interface, Edge Function, notification push ou fonct
 | `supervisor` | Surveillant |
 | `super_admin` | Supervision globale de la plateforme, transverse : sans école |
 
-Le rôle `super_admin` n’appartient à aucune école (`profiles.school_id` est
-nul, ce que la contrainte `profiles_school_required_unless_super_admin`
-impose pour tout autre rôle). Il dispose de politiques de **lecture seule**
+Le rôle `super_admin` n’appartient à aucune école : la contrainte
+`profiles_school_matches_super_admin` impose la biconditionnalité
+`(role = 'super_admin') = (school_id is null)`, donc un `super_admin` ne peut
+pas être rattaché à une école et un profil sans école ne peut être qu’un
+`super_admin`. Il dispose de politiques de **lecture seule**
 sur les 15 tables : aucune politique `INSERT`, `UPDATE` ou `DELETE` ne le
 concerne, et le détail figure dans `docs/SUPERVISION.md`.
 

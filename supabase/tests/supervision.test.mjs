@@ -54,13 +54,35 @@ test('le profil de supervision globale n’appartient à aucune école', async (
   assert.equal(profile.school_id, null);
   assert.equal(profile.is_active, true);
 
-  // La contrainte interdit l'absence d'école pour tout autre rôle.
+  // La biconditionnalité est garantie par la base : un profil de supervision
+  // globale ne peut pas être rattaché à une école...
+  await assert.rejects(
+    database.query(
+      `insert into public.profiles (id, school_id, role, full_name)
+       values ($1, $2, 'super_admin', 'Supervision rattachée')`,
+      ['d0000000-0000-4000-8000-000000000002', ids.schoolA],
+    ),
+    'Un rôle de supervision globale ne doit pas pouvoir être rattaché à une école',
+  );
+
+  // ... et un profil sans école ne peut être qu'un rôle de supervision.
   await assert.rejects(
     database.query(
       `insert into public.profiles (id, school_id, role, full_name)
        values ($1, null, 'parent', 'Parent sans école')`,
       ['d0000000-0000-4000-8000-000000000001'],
     ),
+    'Un rôle d\'école ne doit pas pouvoir être créé sans école',
+  );
+
+  // La biconditionnalité vaut aussi en modification : un profil de
+  // supervision globale ne peut pas être rattaché à une école après coup.
+  await assert.rejects(
+    database.query(
+      'update public.profiles set school_id = $1 where id = $2',
+      [ids.schoolA, ids.superAdmin],
+    ),
+    'Le rattachement d\'un profil de supervision globale doit être refusé',
   );
 });
 

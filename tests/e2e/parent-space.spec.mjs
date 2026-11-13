@@ -136,6 +136,11 @@ test.describe('espace parent', () => {
     await expect(contenu).toContainText('Devoir fictif A1');
     await expect(contenu).toContainText('Composition fictive A1');
     await expect(contenu).not.toContainText('Brouillon jamais publié');
+
+    // La moyenne globale est sur 20 et se distingue de la moyenne par matière.
+    await expect(contenu).toContainText('Moyenne générale');
+    await expect(contenu).toContainText('Moyenne :');
+    await expect(contenu).toContainText('/ 20');
   });
 
   test('chaque onglet affiche ses données et ses états vides', async ({ page }) => {

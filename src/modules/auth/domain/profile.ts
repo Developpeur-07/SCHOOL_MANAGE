@@ -85,12 +85,22 @@ export function mapProfileRow(row: unknown): UserProfile | null {
   };
 }
 
+/**
+ * Rattachement school.
+ *
+ * La base applique la biconditionnalité `super_admin` <=> aucune école
+ * (`profiles_school_matches_super_admin`). Le domaine la vérifie aussi : une
+ * ligne incohérente est rejetée plutôt que d'être acceptée en silence.
+ */
 function readSchoolId(value: unknown, role: AppRole): string | null {
-  if (typeof value === 'string') return value;
-  if (value === null || value === undefined) {
-    if (isSuperAdmin(role)) return null;
+  if (isSuperAdmin(role)) {
+    // Un rôle de supervision globale n'appartient à aucune école.
+    if (value === null || value === undefined) return null;
     throw new Error('PROFILE_ROW_INVALID');
   }
+
+  // Tout autre rôle doit être rattaché à une école.
+  if (typeof value === 'string') return value;
 
   throw new Error('PROFILE_ROW_INVALID');
 }

@@ -28,12 +28,22 @@ conséquences fautives : il ne verrait pas les autres, et il apparaîtrait dans
 la liste des personnels de cette école.
 
 Le profil de supervision est donc créé avec `school_id = null`. La contrainte
-`profiles_school_required_unless_super_admin` impose que tout autre rôle
-reste rattaché à une école :
+`profiles_school_matches_super_admin` impose la **biconditionnalité** : le rôle
+de supervision globale et l’absence d’école de rattachement vont de pair.
 
 ```sql
-check (role = 'super_admin' or school_id is not null)
+check ((role = 'super_admin') = (school_id is null))
 ```
+
+Autrement dit :
+
+- un `super_admin` ne peut pas être rattaché à une école, même par une
+  modification ultérieure ;
+- un profil sans école ne peut être qu’un `super_admin`.
+
+Cette équivalence est garantie par la base, et non par le seul code
+applicatif : le domaine `mapProfileRow` la revérifie et rejette une ligne
+incohérente (`PROFILE_ROW_INVALID`).
 
 Le journal d’audit étant dimensionné par école (`audit_log.school_id` non
 nul), les modifications de profils de plateforme ne sont pas consignées dans

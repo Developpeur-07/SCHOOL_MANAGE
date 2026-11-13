@@ -114,6 +114,7 @@
       "evaluation": "Évaluation",
       "score": "Note",
       "average": "Moyenne générale",
+      "subjectAverage": "Moyenne",
       "empty": "Aucune note n’a encore été publiée pour {studentName}.",
       "emptyHint": "Les notes apparaissent dès que l’école les publie."
     },

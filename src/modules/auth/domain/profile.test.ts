@@ -72,6 +72,12 @@ describe('mapProfileRow', () => {
     );
   });
 
+  it('refuse un rôle de supervision globale rattaché à une école', () => {
+    expect(() =>
+      mapProfileRow({ ...baseRow, role: 'super_admin', school_id: baseRow.school_id }),
+    ).toThrow('PROFILE_ROW_INVALID');
+  });
+
   it('retourne null sans profil, mais refuse une ligne malformée', () => {
     expect(mapProfileRow(null)).toBeNull();
     expect(() => mapProfileRow({ ...baseRow, id: 42 })).toThrow('PROFILE_ROW_INVALID');

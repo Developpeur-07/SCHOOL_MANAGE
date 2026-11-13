@@ -98,6 +98,7 @@ l’internationalisation.
 
 - **La moyenne générale est une note sur 20**, selon le système scolaire
   français : elle est affichée « Moyenne générale » et valorisée `14,5 / 20`.
+  Les moyennes par matière sont, elles, libellées « Moyenne ».
   Ce n’est ni un pourcentage, ni une moyenne sur 100.
   - Chaque note est ramenée sur 20 avant calcul : une évaluation sur 10
     (`8/10`) ou sur 50 (`45/50`) devient `16/20` et `18/20`, ce qui rend les

@@ -59,7 +59,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
                   {group.subjectName}
                 </h2>
                 <p className="text-sm font-semibold text-slate-600">
-                  {messages.parent.results.average} :{' '}
+                  {messages.parent.results.subjectAverage} :{' '}
                   {group.average === null ? '—' : `${group.average.toFixed(1)} / 20`}
                 </p>
               </div>
