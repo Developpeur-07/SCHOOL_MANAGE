@@ -387,7 +387,7 @@ Périmètre réel : **14 lignes**, **7 colonnes de jeton**, aucune autre colonne
 
 Piste écartée : la table `auth.factors`. GoTrue v2.197.0 mappe `Factor.TableName()` sur `mfa_factors`, et le ledger `auth.schema_migrations` de la base correspond exactement à cette version (`20260831180000`). Aucune vue de compatibilité n’est donc nécessaire, et le ticket support suggéré par le rapport amont n’a pas été envoyé.
 
-Vérification après correctif : `POST /auth/v1/token?grant_type=password` répond `HTTP 200` et délivre un jeton pour le compte de démonstration. La fonction Edge de diagnostic temporaire utilisée pour cette vérification a été supprimée dans la foulée.
+Vérification après correctif : `POST /auth/v1/token?grant_type=password` répond `HTTP 200` et délivre un jeton pour le compte de démonstration. La fonction Edge de diagnostic temporaire utilisée pour cette vérification a été supprimée dans la foulée. Le compte de démonstration lui-même a ensuite été supprimé du projet hébergé, avec son profil et ses liens tuteurs : aucun compte à mot de passe connu ne subsiste en production.
 
 La reproduction est assurée par `supabase/migrations/20261110000001_auth_login_compatibility.sql` et par le bloc correspondant de `supabase/seed.sql` (voir `docs/AUTHENTIFICATION.md`, section 3 bis).
 

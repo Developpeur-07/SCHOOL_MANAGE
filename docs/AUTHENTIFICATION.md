@@ -127,6 +127,12 @@ Les lignes `auth.users` du seed de l’étape 2 ont un mot de passe vide et ne p
 
 Le compte de démonstration utilisé pour la validation en ligne est provisionné par Supabase Auth (mot de passe connu, e-mail en domaine `.invalid`, profil `parent` actif, deux enfants liés) : il est créé par un script de provisionnement, jamais par le seed.
 
+**Ce compte a été supprimé du projet hébergé** après les validations : il ne
+subsiste en production aucun compte de démonstration à mot de passe connu. La
+procédure de provisionnement reste documentée ici pour qu'un environnement de
+test puisse en créer un à la demande ; ce compte doit être révoqué dès la fin
+de la validation.
+
 **Téléphone non implémenté à cette étape :** Supabase prend en charge l’OTP téléphone, mais aucun fournisseur SMS ni configuration Auth réelle n’est accessible. Ajouter ce parcours sans le tester créerait une fonctionnalité non fiable et pourrait engendrer des coûts. Il ne sera envisagé qu’après accès à une configuration de test explicite.
 
 Après autorisation explicite, les migrations distantes 3 à 5 ont été appliquées sur le projet LIAKOLO et la RLS a été vérifiée en lecture avec des claims JWT fictifs. Les migrations 1 et 2 ainsi que le seed étaient déjà présents et n’ont pas été rejoués. Voir `docs/SECURITE.md`, section 8.4. Aucun mot de passe n’a été modifié.
