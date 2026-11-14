@@ -7,22 +7,171 @@
   },
   "public": {
     "badge": "Espace familles et personnels",
-    "valueTitle": "Un écran adapté à chaque profil",
-    "valueBody": "Les parents utilisent l’application sur téléphone ou tablette ; le portail de l’école s’exploite sur les grands écrans.",
-    "devices": [
-      {
-        "title": "Téléphone",
-        "body": "L’espace parent se lit et se navigue à une main, avec des cibles tactiles larges."
-      },
-      {
-        "title": "Tablette",
-        "body": "Les listes et les tableaux restent lisibles et les actions restent à portée de doigt."
-      },
-      {
-        "title": "Ordinateur",
-        "body": "Le portail de l’école utilise la largeur de l’écran pour les vues d’ensemble."
-      }
-    ]
+    "nav": {
+      "label": "Navigation principale",
+      "benefits": "Avantages",
+      "usages": "Usages",
+      "profiles": "Profils",
+      "testimonial": "Témoignage",
+      "support": "Support",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu",
+      "login": "Se connecter"
+    },
+    "hero": {
+      "title": "La vie scolaire de votre école, réunie au même endroit",
+      "subtitle": "Notes, assiduité, frais et annonces : SCHOOL_MANAGE rassemble ce qui compte pour les familles et les personnels de l’école. Les parents consultent depuis leur téléphone, le portail de l’école se pilote au clavier sur grand écran.",
+      "primaryCta": "Se connecter",
+      "primaryCtaHint": "Votre école vous fournit le compte et le mot de passe.",
+      "secondaryCta": "Voir les usages",
+      "reassurance": [
+        "Consultation seule : l’école publie, la famille lit.",
+        "Chaque parent ne voit que ses propres enfants.",
+        "Les écrans publics restent consultables hors connexion."
+      ],
+      "previewNote": "Aperçu illustratif : les données affichées sont fictives.",
+      "sceneLabel": "Aperçu des écrans de l’espace parent",
+      "scenes": [
+        {
+          "id": "resume",
+          "title": "Résumé",
+          "description": "Moyenne générale, assiduité et reste à payer réunis sur un seul écran."
+        },
+        {
+          "id": "resultats",
+          "title": "Résultats",
+          "description": "Les notes publiées par matière, avec la moyenne de chaque matière."
+        },
+        {
+          "id": "vie-scolaire",
+          "title": "Vie scolaire",
+          "description": "Présences, absences et retards, saisis au quotidien par l’école."
+        },
+        {
+          "id": "paiements",
+          "title": "Paiements",
+          "description": "Frais, échéances et reçus, avec le reste à payer toujours visible."
+        },
+        {
+          "id": "infos",
+          "title": "Infos",
+          "description": "Les annonces de l’école et vos notifications, au même endroit."
+        }
+      ],
+      "pause": "Suspendre l’aperçu",
+      "resume": "Reprendre l’aperçu",
+      "sceneIndicator": "Voir la scène {title}",
+      "sceneStatus": "Scène {index} sur {total} : {title}"
+    },
+    "benefits": {
+      "title": "Ce que la plateforme change au quotidien",
+      "intro": "Une page publique sobre, et des espaces authentifiés qui n’affichent que ce qui concerne la personne qui se connecte.",
+      "items": [
+        {
+          "title": "Une information qui ne se contredit pas",
+          "body": "Notes, assiduité, frais et annonces proviennent de la même source : plus de discrepancy entre un message et un relevé."
+        },
+        {
+          "title": "Lecture seule côté famille",
+          "body": "Les parents consultent. Seule l’école saisit et publie, ce qui écarte les modifications accidentelles."
+        },
+        {
+          "title": "Isolation stricte",
+          "body": "Un parent ne voit que ses enfants, un rôle d’école que la sienne, et la supervision que des agrégats."
+        },
+        {
+          "title": "Continuité hors connexion",
+          "body": "Les écrans publics déjà visités restent lisibles ; les données familiales ne sont jamais mises en cache."
+        }
+      ]
+    },
+    "usages": {
+      "title": "Un aperçu des usages",
+      "intro": "Trois surfaces distinctes, une même discipline : ne montrer que ce que le profil connecté est autorisé à voir.",
+      "items": [
+        {
+          "title": "Espace parent",
+          "body": "Cinq onglets — Résumé, Résultats, Vie scolaire, Paiements, Infos — et un sélecteur d’enfant pour les familles qui en ont plusieurs."
+        },
+        {
+          "title": "Supervision multi-écoles",
+          "body": "Une vue transversale des écoles, des effectifs et des impayés, strictement consultative et signalée comme telle."
+        },
+        {
+          "title": "Écran hors connexion",
+          "body": "Un écran dédié explique ce qui reste accessible et ce qui ne l’est pas, sans jamais promettre de données familiales hors ligne."
+        }
+      ],
+      "note": "Le portail de l’école s’ouvre par rôle. La consultation et la supervision sont disponibles ; les écrans de saisie sont activés progressivement."
+    },
+    "profiles": {
+      "title": "Un écran adapté à chaque profil",
+      "intro": "La plateforme s’adapte au poste de travail : la famille consulte au pouce, l’école travaille à la souris.",
+      "items": [
+        {
+          "device": "Téléphone",
+          "profile": "Parents",
+          "status": "ready",
+          "title": "Une information, une main",
+          "body": "Moyenne générale, assiduité et reste à payer tiennent sur un écran. Les onglets se font glisser et les cibles restent larges : rien à zoomer, rien à rater."
+        },
+        {
+          "device": "Tablette",
+          "profile": "Parents et école",
+          "status": "ready",
+          "title": "Le compromis de la salle de réunion",
+          "body": "Les listes et les tableaux restent lisibles à deux, et les actions demeurent à portée de doigt pendant un échange."
+        },
+        {
+          "device": "Ordinateur",
+          "profile": "École et supervision",
+          "status": "partial",
+          "title": "La largeur du portail",
+          "body": "L’espace école s’exploite sur grand écran : la saisie se fait au clavier, les tableaux restent lisibles, et la supervision compare les écoles côte à côte."
+        }
+      ],
+      "statusReady": "Disponible",
+      "statusPartial": "Ouverture progressive"
+    },
+    "testimonial": {
+      "eyebrow": "Témoignage",
+      "title": "Ce que change l’accès direct aux informations",
+      "quote": "Je ne demande plus à l’école où en sont les frais : je regarde. Le reste à payer et la dernière note sont là, le matin, depuis mon téléphone.",
+      "author": "Parent de deux élèves",
+      "context": "Témoignage illustratif, en attente d’un retour client vérifié."
+    },
+    "support": {
+      "title": "Contacter le support",
+      "description": "Un accès bloqué ou une question sur les données de votre enfant ? L’administration de votre école reste votre interlocuteur direct : c’est elle qui tient les comptes, les rattachements et les publications. Pour un incident technique, relevez la référence affichée sous le message d’erreur : elle identifie la panne sans exposer vos données.",
+      "action": "Contacter le support",
+      "panelTitle": "Comment obtenir de l’aide",
+      "steps": [
+        {
+          "title": "Identifiants et rattachement",
+          "body": "Mot de passe oublié, compte désactivé ou enfant non rattaché : votre école réactive l’accès et ajuste le lien familial."
+        },
+        {
+          "title": "Données de l’école",
+          "body": "Une note, un montant ou une annonce qui paraît incohérent : seule l’école saisit et publie, elle seule peut corriger."
+        },
+        {
+          "title": "Incident technique",
+          "body": "Conservez la référence technique affichée sur l’écran de connexion et transmettez-la à votre école."
+        }
+      ],
+      "copyTemplate": "Copier le message pour mon école",
+      "copied": "Message copié dans le presse-papiers.",
+      "copyFailed": "La copie a échoué. Sélectionnez le texte et copiez-le manuellement.",
+      "template": "Bonjour,\n\nJe rencontre un problème avec SCHOOL_MANAGE.\n\nÉcole :\nRôle :\nÉlève concerné (espace parent) :\nMessage affiché :\nRéférence technique :\n\nMerci d’avance.",
+      "loginCta": "Se connecter",
+      "offlineCta": "Voir l’écran hors connexion"
+    },
+    "footer": {
+      "navigation": "Navigation",
+      "offlineNote": "En cas de coupure réseau, l’application affiche un écran hors connexion dédié.",
+      "offlineLink": "Écran hors connexion",
+      "legal": "© 2026 SCHOOL_MANAGE — données de démonstration, aucune information personnelle réelle."
+    }
   },
   "common": {
     "skipToContent": "Aller au contenu",

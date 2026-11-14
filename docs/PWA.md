@@ -23,6 +23,12 @@ Le service worker est enregistré à la racine uniquement en production. Le mode
 | Ressource | Stratégie | Conservation |
 | --- | --- | --- |
 | `/`, `/compte-desactive`, `/hors-ligne` | Précache puis network-first | Autorisée : pages publiques sans donnée utilisateur |
+
+L'accueil public a été remplacé par une page de présentation animée à l'étape 8
+(voir `docs/ACCUEIL-PUBLIC.md`). Elle reste entièrement publique, ne lit
+aucune donnée Supabase et demeure servie depuis le précache hors connexion.
+Son hero suspendu sa rotation lorsque l'onglet est masqué ou que la page
+n'est plus à l'écran.
 | `/_next/static/*`, icônes, manifeste | Cache-first, réseau au premier accès | Autorisée : assets publics |
 | `/connexion` | Network-only, fallback `/hors-ligne` | Jamais |
 | `/compte`, `/parent`, `/ecole`, `/enseignant` et autres pages | Network-only, fallback `/hors-ligne` | Jamais |

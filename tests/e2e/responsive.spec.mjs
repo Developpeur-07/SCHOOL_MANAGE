@@ -36,38 +36,49 @@ for (const viewport of VIEWPORTS) {
   }
 }
 
-test('la mise en page s’adapte : contenu empilé sur mobile, deux colonnes sur grand écran', async ({
+test('la mise en page s’adapte : hero empilé sur mobile, deux colonnes sur grand écran', async ({
   page,
 }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
 
-  const sections = page.locator('main > div > section');
-  await expect(sections).toHaveCount(2);
+  // Le hero oppose le texte de présentation à l'aperçu animé de l'espace parent.
+  const titre = page.locator('#hero-titre');
+  const apercu = page.locator('[aria-roledescription="carrousel"]');
+  await expect(titre).toBeVisible();
+  await expect(apercu).toBeVisible();
 
-  const cadres = async () =>
-    sections.evaluateAll((elements) =>
-      elements.map((element) => {
-        const rect = element.getBoundingClientRect();
-        return {
-          gauche: Math.round(rect.left),
-          haut: Math.round(rect.top),
-          bas: Math.round(rect.bottom),
-        };
-      }),
-    );
+  const cadres = async () => {
+    const gauche = await titre.boundingBox();
+    const droite = await apercu.boundingBox();
+    return { gauche, droite };
+  };
 
   await page.setViewportSize({ width: 360, height: 800 });
-  const [hautMobile, basMobile] = await cadres();
-  expect(hautMobile.gauche).toBe(basMobile.gauche);
-  expect(hautMobile.bas, 'sections empilées sur mobile').toBeLessThanOrEqual(basMobile.haut);
+  const mobile = await cadres();
+  expect(mobile.droite.y, 'aperçu sous le texte sur mobile').toBeGreaterThan(mobile.gauche.y);
+  expect(Math.abs(mobile.gauche.x - mobile.droite.x), 'colonnes empilées sur mobile').toBeLessThan(
+    4,
+  );
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  const [gauche, droite] = await cadres();
-  expect(Math.abs(gauche.gauche - droite.gauche), 'sections côte à côte sur grand écran').toBeGreaterThan(
-    100,
-  );
-  expect(gauche.haut, 'sections sur la même ligne').toBeLessThan(droite.bas);
-  expect(droite.haut).toBeLessThan(gauche.bas);
+  const desktop = await cadres();
+  expect(
+    Math.abs(desktop.gauche.x - desktop.droite.x),
+    'aperçu à droite du texte sur grand écran',
+  ).toBeGreaterThan(100);
+  expect(desktop.droite.y, 'colonnes sur la même ligne').toBeLessThan(desktop.gauche.y + 200);
+});
+
+test('l’accueil public présente toutes ses rubriques', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  for (const identifiant of ['avantages', 'usages', 'profils', 'temoignage', 'support']) {
+    await expect(page.locator(`main section#${identifiant}`)).toHaveCount(1);
+  }
+
+  // Un seul titre de niveau 1, et une hiérarchie de titres cohérente.
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(5);
 });
 
 test('le formulaire de connexion reste utilisable sur téléphone', async ({ page }) => {

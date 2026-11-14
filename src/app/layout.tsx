@@ -2,9 +2,13 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import '@/styles/globals.css';
 import { messages } from '@/shared/config/messages';
+import { getPublicSiteUrl } from '@/shared/config/site';
 import { ServiceWorkerRegistration } from '@/shared/pwa/service-worker-registration';
 
 export const metadata: Metadata = {
+  // Base des URL absolues : canonical, Open Graph. Elle provient de
+  // l'environnement de build, jamais d'un domaine codé en dur.
+  metadataBase: new URL(getPublicSiteUrl()),
   title: {
     default: messages.app.name,
     template: `%s · ${messages.app.name}`,

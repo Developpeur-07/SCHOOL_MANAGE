@@ -550,7 +550,7 @@ Chaque ligne est une porte de validation : l’étape suivante ne commence qu’
 | **5 — Écrans parent** | Résumé, Résultats, Vie scolaire, Paiements, Infos ; états complets et lecture RLS — **livré, voir `docs/ESPACE-PARENT.md`** | Parent multi-enfants sans fuite, lecture seule, petits écrans et réseau lent testés |
 | **6 — Portail école** | Saisies notes/présences, paiements et reçus, annonces aux quatre cibles, accusés de lecture, audit | Permissions par rôle testées, aucune notification prématurée, chaque action tracée |
 | **7 — Notifications** | Abonnement Web Push, distribution Edge, centre lu/non lu, contrat de repli SMS/WhatsApp non implémenté | Payloads minimaux, destinataires exacts, désabonnement et échecs traités, aucun envoi SMS/WhatsApp |
-| **8 — Accueil animé** | Hero public de cinq scènes, mockups SVG/CSS/Motion et contrôles accessibles | Rotation 4–5 s, pause, indicateurs, stagger, reduced motion, transform/opacity uniquement |
+| **8 — Accueil animé** | Hero public de cinq scènes, mockups SVG/CSS/Motion et contrôles accessibles — **livré, voir `docs/ACCUEIL-PUBLIC.md`** | Rotation 4–5 s, pause, indicateurs, stagger, reduced motion, transform/opacity uniquement |
 | **9 — Finalisation** | Tests critiques, audits Lighthouse/accessibilité/hors ligne, README installation/env/Vercel, risques restants | Résultats reproductibles, risques classés, aucune mise en production effectuée sans validation |
 
 ### Ordre technique interne recommandé

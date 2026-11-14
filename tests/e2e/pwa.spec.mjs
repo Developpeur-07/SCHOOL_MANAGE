@@ -47,7 +47,11 @@ test('le service worker sert le shell public et aucune page privée hors ligne',
 
   await context.setOffline(true);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('SCHOOL_MANAGE');
+  // L'accueil public reste lisible hors connexion : le hero et ses rubriques
+  // sont servis depuis le précache, sans aucune donnée personnelle.
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.locator('main section#support')).toHaveCount(1);
+  await expect(page.getByRole('link', { name: 'Se connecter' }).first()).toBeVisible();
 
   await page.goto('/parent', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Vous êtes hors ligne');
