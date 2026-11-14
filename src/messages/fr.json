@@ -1,0 +1,378 @@
+{
+  "app": {
+    "name": "SCHOOL_MANAGE",
+    "tagline": "L’école vous informe, simplement.",
+    "loading": "Chargement…",
+    "home": "Accueil"
+  },
+  "public": {
+    "badge": "Espace familles et personnels",
+    "nav": {
+      "label": "Navigation principale",
+      "benefits": "Avantages",
+      "usages": "Usages",
+      "profiles": "Profils",
+      "testimonial": "Témoignage",
+      "support": "Support",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu",
+      "login": "Se connecter"
+    },
+    "hero": {
+      "title": "La vie scolaire de votre école, réunie au même endroit",
+      "subtitle": "Notes, assiduité, frais et annonces : SCHOOL_MANAGE rassemble ce qui compte pour les familles et les personnels de l’école. Les parents consultent depuis leur téléphone, le portail de l’école se pilote au clavier sur grand écran.",
+      "primaryCta": "Se connecter",
+      "primaryCtaHint": "Votre école vous fournit le compte et le mot de passe.",
+      "secondaryCta": "Voir les usages",
+      "reassurance": [
+        "Consultation seule : l’école publie, la famille lit.",
+        "Chaque parent ne voit que ses propres enfants.",
+        "Les écrans publics restent consultables hors connexion."
+      ],
+      "previewNote": "Aperçu illustratif : les données affichées sont fictives.",
+      "sceneLabel": "Aperçu des écrans de l’espace parent",
+      "scenes": [
+        {
+          "id": "resume",
+          "title": "Résumé",
+          "description": "Moyenne générale, assiduité et reste à payer réunis sur un seul écran."
+        },
+        {
+          "id": "resultats",
+          "title": "Résultats",
+          "description": "Les notes publiées par matière, avec la moyenne de chaque matière."
+        },
+        {
+          "id": "vie-scolaire",
+          "title": "Vie scolaire",
+          "description": "Présences, absences et retards, saisis au quotidien par l’école."
+        },
+        {
+          "id": "paiements",
+          "title": "Paiements",
+          "description": "Frais, échéances et reçus, avec le reste à payer toujours visible."
+        },
+        {
+          "id": "infos",
+          "title": "Infos",
+          "description": "Les annonces de l’école et vos notifications, au même endroit."
+        }
+      ],
+      "pause": "Suspendre l’aperçu",
+      "resume": "Reprendre l’aperçu",
+      "sceneIndicator": "Voir la scène {title}",
+      "sceneStatus": "Scène {index} sur {total} : {title}"
+    },
+    "benefits": {
+      "title": "Ce que la plateforme change au quotidien",
+      "intro": "Une page publique sobre, et des espaces authentifiés qui n’affichent que ce qui concerne la personne qui se connecte.",
+      "items": [
+        {
+          "title": "Une information qui ne se contredit pas",
+          "body": "Notes, assiduité, frais et annonces proviennent de la même source : plus de discrepancy entre un message et un relevé."
+        },
+        {
+          "title": "Lecture seule côté famille",
+          "body": "Les parents consultent. Seule l’école saisit et publie, ce qui écarte les modifications accidentelles."
+        },
+        {
+          "title": "Isolation stricte",
+          "body": "Un parent ne voit que ses enfants, un rôle d’école que la sienne, et la supervision que des agrégats."
+        },
+        {
+          "title": "Continuité hors connexion",
+          "body": "Les écrans publics déjà visités restent lisibles ; les données familiales ne sont jamais mises en cache."
+        }
+      ]
+    },
+    "usages": {
+      "title": "Un aperçu des usages",
+      "intro": "Trois surfaces distinctes, une même discipline : ne montrer que ce que le profil connecté est autorisé à voir.",
+      "items": [
+        {
+          "title": "Espace parent",
+          "body": "Cinq onglets — Résumé, Résultats, Vie scolaire, Paiements, Infos — et un sélecteur d’enfant pour les familles qui en ont plusieurs."
+        },
+        {
+          "title": "Supervision multi-écoles",
+          "body": "Une vue transversale des écoles, des effectifs et des impayés, strictement consultative et signalée comme telle."
+        },
+        {
+          "title": "Écran hors connexion",
+          "body": "Un écran dédié explique ce qui reste accessible et ce qui ne l’est pas, sans jamais promettre de données familiales hors ligne."
+        }
+      ],
+      "note": "Le portail de l’école s’ouvre par rôle. La consultation et la supervision sont disponibles ; les écrans de saisie sont activés progressivement."
+    },
+    "profiles": {
+      "title": "Un écran adapté à chaque profil",
+      "intro": "La plateforme s’adapte au poste de travail : la famille consulte au pouce, l’école travaille à la souris.",
+      "items": [
+        {
+          "device": "Téléphone",
+          "profile": "Parents",
+          "status": "ready",
+          "title": "Une information, une main",
+          "body": "Moyenne générale, assiduité et reste à payer tiennent sur un écran. Les onglets se font glisser et les cibles restent larges : rien à zoomer, rien à rater."
+        },
+        {
+          "device": "Tablette",
+          "profile": "Parents et école",
+          "status": "ready",
+          "title": "Le compromis de la salle de réunion",
+          "body": "Les listes et les tableaux restent lisibles à deux, et les actions demeurent à portée de doigt pendant un échange."
+        },
+        {
+          "device": "Ordinateur",
+          "profile": "École et supervision",
+          "status": "partial",
+          "title": "La largeur du portail",
+          "body": "L’espace école s’exploite sur grand écran : la saisie se fait au clavier, les tableaux restent lisibles, et la supervision compare les écoles côte à côte."
+        }
+      ],
+      "statusReady": "Disponible",
+      "statusPartial": "Ouverture progressive"
+    },
+    "testimonial": {
+      "eyebrow": "Témoignage",
+      "title": "Ce que change l’accès direct aux informations",
+      "quote": "Je ne demande plus à l’école où en sont les frais : je regarde. Le reste à payer et la dernière note sont là, le matin, depuis mon téléphone.",
+      "author": "Parent de deux élèves",
+      "context": "Témoignage illustratif, en attente d’un retour client vérifié."
+    },
+    "support": {
+      "title": "Contacter le support",
+      "description": "Un accès bloqué ou une question sur les données de votre enfant ? L’administration de votre école reste votre interlocuteur direct : c’est elle qui tient les comptes, les rattachements et les publications. Pour un incident technique, relevez la référence affichée sous le message d’erreur : elle identifie la panne sans exposer vos données.",
+      "action": "Contacter le support",
+      "panelTitle": "Comment obtenir de l’aide",
+      "steps": [
+        {
+          "title": "Identifiants et rattachement",
+          "body": "Mot de passe oublié, compte désactivé ou enfant non rattaché : votre école réactive l’accès et ajuste le lien familial."
+        },
+        {
+          "title": "Données de l’école",
+          "body": "Une note, un montant ou une annonce qui paraît incohérent : seule l’école saisit et publie, elle seule peut corriger."
+        },
+        {
+          "title": "Incident technique",
+          "body": "Conservez la référence technique affichée sur l’écran de connexion et transmettez-la à votre école."
+        }
+      ],
+      "copyTemplate": "Copier le message pour mon école",
+      "copied": "Message copié dans le presse-papiers.",
+      "copyFailed": "La copie a échoué. Sélectionnez le texte et copiez-le manuellement.",
+      "template": "Bonjour,\n\nJe rencontre un problème avec SCHOOL_MANAGE.\n\nÉcole :\nRôle :\nÉlève concerné (espace parent) :\nMessage affiché :\nRéférence technique :\n\nMerci d’avance.",
+      "loginCta": "Se connecter",
+      "offlineCta": "Voir l’écran hors connexion"
+    },
+    "footer": {
+      "navigation": "Navigation",
+      "offlineNote": "En cas de coupure réseau, l’application affiche un écran hors connexion dédié.",
+      "offlineLink": "Écran hors connexion",
+      "legal": "© 2026 SCHOOL_MANAGE — données de démonstration, aucune information personnelle réelle."
+    }
+  },
+  "common": {
+    "skipToContent": "Aller au contenu",
+    "logout": "Se déconnecter",
+    "logoutPending": "Déconnexion…",
+    "logoutError": "La déconnexion a échoué. Réessayez.",
+    "retry": "Réessayer",
+    "errorTitle": "Une erreur est survenue",
+    "errorBody": "La page n’a pas pu être chargée. Vérifiez votre connexion puis réessayez.",
+    "configurationTitle": "Configuration Supabase requise",
+    "configurationBody": "Renseignez les variables publiques NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY pour activer la connexion."
+  },
+  "auth": {
+    "loginTitle": "Connexion à votre espace",
+    "loginSubtitle": "Utilisez le compte fourni par votre école.",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "vous@exemple.org",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "submit": "Se connecter",
+    "submitPending": "Connexion…",
+    "invalidCredentials": "E-mail ou mot de passe incorrect.",
+    "emailNotConfirmed": "Votre adresse e-mail n’est pas encore confirmée. Contactez votre école.",
+    "rateLimited": "Trop de tentatives de connexion. Patientez quelques minutes puis réessayez.",
+    "serviceUnavailable": "Le service de connexion est momentanément indisponible. Réessayez dans quelques instants.",
+    "networkError": "Impossible de joindre le service de connexion. Vérifiez votre connexion internet puis réessayez.",
+    "unknownError": "La connexion a échoué. Réessayez, ou contactez votre école si le problème persiste.",
+    "errorReference": "Référence technique",
+    "disabledTitle": "Compte désactivé",
+    "disabledBody": "Votre compte est désactivé. Contactez votre école pour vérifier votre accès."
+  },
+  "roles": {
+    "parent": "Parent",
+    "direction": "Direction",
+    "secretary": "Secrétariat",
+    "accountant": "Comptable",
+    "teacher": "Enseignant",
+    "supervisor": "Surveillant",
+    "super_admin": "Super-admin"
+  },
+  "parent": {
+    "title": "Espace parent",
+    "childSelector": "Enfant consulté",
+    "selectChild": "Choisir un enfant",
+    "selectChildHint": "Sélectionnez l’enfant dont vous souhaitez ouvrir l’espace.",
+    "noChildrenTitle": "Aucun enfant rattaché",
+    "noChildrenBody": "Votre compte ne possède aucun lien actif avec un enfant. Contactez le secrétariat de votre école.",
+    "childSpaceTitle": "Espace de {studentName}",
+    "class": "Classe",
+    "readOnlyNotice": "Consultation seule : l’école saisit et publie les informations.",
+    "loadingTitle": "Chargement de l’espace de l’enfant…",
+    "loadingHint": "Les informations affichées peuvent mettre quelques secondes à arriver sur un réseau lent.",
+    "errorTitle": "Cet onglet n’a pas pu être chargé",
+    "errorBody": "Les informations de votre enfant n’ont pas pu être récupérées. Vérifiez votre connexion internet puis réessayez.",
+    "offlineHint": "Sans connexion, seules les informations déjà enregistrées sur l’appareil restent consultables.",
+    "childNotFoundTitle": "Cet enfant n’est pas rattaché à votre compte",
+    "childNotFoundBody": "Vous ne pouvez consulter que les enfants que l’école a rattachés à votre compte. En cas d’erreur, contactez le secrétariat.",
+    "childNotFoundAction": "Revenir à mes enfants",
+    "tabs": {
+      "resume": "Résumé",
+      "resultats": "Résultats",
+      "vie-scolaire": "Vie scolaire",
+      "paiements": "Paiements",
+      "infos": "Infos"
+    },
+    "tabsNavLabel": "Sections de l’espace de l’enfant",
+    "resume": {
+      "title": "Résumé",
+      "latestGrades": "Dernières notes",
+      "attendance": "Assiduité",
+      "finance": "Frais",
+      "news": "Dernières infos",
+      "seeAll": "Voir l’onglet",
+      "noGrades": "Aucune note publiée pour le moment.",
+      "noAttendance": "Aucune présence enregistrée pour le moment.",
+      "noFees": "Aucun frais enregistré pour le moment.",
+      "noNews": "Aucune information publiée pour le moment.",
+      "average": "Moyenne générale",
+      "averageScale": "sur 20",
+      "presenceRate": "Jours présents",
+      "balance": "Reste à payer",
+      "childrenCount": "Enfants suivis"
+    },
+    "results": {
+      "title": "Résultats",
+      "intro": "Notes publiées par l’école pour {studentName}.",
+      "subject": "Matière",
+      "period": "Période",
+      "evaluation": "Évaluation",
+      "score": "Note",
+      "average": "Moyenne générale",
+      "subjectAverage": "Moyenne",
+      "empty": "Aucune note n’a encore été publiée pour {studentName}.",
+      "emptyHint": "Les notes apparaissent dès que l’école les publie."
+    },
+    "attendance": {
+      "title": "Vie scolaire",
+      "intro": "Présences enregistrées pour {studentName}.",
+      "date": "Date",
+      "status": "Statut",
+      "comment": "Commentaire",
+      "present": "Présent",
+      "absent": "Absent",
+      "late": "Retard",
+      "excused": "Absence justifiée",
+      "empty": "Aucune présence enregistrée pour {studentName}.",
+      "emptyHint": "Le registre est renseigné au quotidien par l’école.",
+      "summaryLabel": "Sur les {count} derniers jours Scolaires enregistrés"
+    },
+    "payments": {
+      "title": "Paiements",
+      "intro": "Frais et règlements enregistrés pour {studentName}.",
+      "label": "Objet",
+      "dueDate": "Échéance",
+      "amount": "Montant",
+      "paid": "Réglé",
+      "remaining": "Reste à payer",
+      "status": {
+        "paid": "Réglé",
+        "partial": "Partiellement réglé",
+        "unpaid": "Non réglé"
+      },
+      "receipts": "Reçus",
+      "receiptNumber": "N° de reçu",
+      "method": "Mode",
+      "methodLabels": {
+        "cash": "Espèces",
+        "bank_transfer": "Virement",
+        "cheque": "Chèque",
+        "other": "Autre"
+      },
+      "paidOn": "Payé le",
+      "noNote": "Sans commentaire",
+      "totalDue": "Total des frais",
+      "totalPaid": "Total réglé",
+      "balance": "Reste à payer",
+      "overdue": "Dont {count} échéance(s) dépassée(s)",
+      "empty": "Aucun frais enregistré pour {studentName}.",
+      "emptyHint": "Les frais et les reçus apparaissent après saisie par l’école."
+    },
+    "news": {
+      "title": "Infos",
+      "intro": "Annonces de l’école destinées à {studentName}.",
+      "publishedOn": "Publiée le",
+      "notifications": "Notifications",
+      "unread": "non lue(s)",
+      "empty": "Aucune information publiée pour {studentName}.",
+      "emptyHint": "Les annonces adressées à votre enfant apparaissent ici.",
+      "noNotifications": "Aucune notification pour le moment."
+    }
+  },
+  "school": {
+    "title": "Portail école",
+    "readyBody": "Votre accès est actif. Les outils de gestion seront ajoutés à l’étape 6, selon votre rôle."
+  },
+  "teacher": {
+    "title": "Espace enseignant",
+    "readyBody": "Votre accès est actif. Les outils de saisie seront ajoutés à l’étape 6, selon votre rôle."
+  },
+  "supervision": {
+    "title": "Supervision globale",
+    "intro": "Vue d’ensemble de toutes les écoles gérées par la plateforme.",
+    "readOnlyNotice": "Consultation seule : la supervision ne crée ni ne modifie aucune donnée.",
+    "schools": "Écoles supervisées",
+    "students": "Élèves",
+    "staff": "Personnel",
+    "parents": "Parents",
+    "classes": "Classes",
+    "publishedGrades": "Notes publiées",
+    "attendance": "Présences",
+    "outstandingFees": "Frais non soldés",
+    "schoolsWithOutstanding": "Écoles avec impayé",
+    "announcements": "Annonces publiées",
+    "notifications": "Notifications",
+    "schoolsTitle": "Écoles",
+    "schoolColumn": "École",
+    "currencyColumn": "Devise",
+    "studentsColumn": "Élèves",
+    "staffColumn": "Personnel",
+    "parentsColumn": "Parents",
+    "classesColumn": "Classes",
+    "gradesColumn": "Notes publiées",
+    "outstandingColumn": "Impayés",
+    "announcementsColumn": "Annonces",
+    "notificationsColumn": "Notifications",
+    "rolesTitle": "Répartition des comptes",
+    "currenciesTitle": "Totaux financiers par devise",
+    "outstandingTotal": "Reste à recouvrer",
+    "collectedTotal": "Encaissé",
+    "noSchool": "Aucune école enregistrée.",
+    "partialNotice": "Vue partielle : les volumes de données dépassent la limite de lecture."
+  },
+  "offline": {
+    "title": "Vous êtes hors ligne",
+    "body": "Vérifiez votre connexion réseau puis réessayez. Les pages publiques déjà visitées restent disponibles.",
+    "privacy": "Pour protéger vos données, les espaces authentifiés et les réponses Supabase ne sont jamais conservés dans le cache.",
+    "home": "Revenir à l’accueil public"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n’existe pas ou vous n’avez pas l’autorisation d’y accéder.",
+    "action": "Revenir à mon espace"
+  }
+}
