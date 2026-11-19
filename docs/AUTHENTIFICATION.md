@@ -159,18 +159,34 @@ npm run start
 ```
 
 En pratique, `npm run preview` fait le montage complet : il construit
-l’application avec la bonne URL publique, démarre le Supabase local, attend
-qu’il réponde, puis sert l’application sur le port 3200. L’origine publique
-est déduite de `E2B_SANDBOX_ID` ; en dehors d’un environnement de
-prévisualisation, le navigateur et le serveur partageant la machine, l’URL
-locale est utilisée directement. Les identifiants de connexion sont ceux du
-harnais E2E, rappelés à l’écran :
+l’application, démarre le Supabase local, attend qu’il réponde, puis sert
+l’application sur le port 3200. Trois modes sont possibles, choisis par
+`PREVIEW_MODE` :
+
+| Mode | Navigateur | Serveur | Usage |
+| --- | --- | --- | --- |
+| `hybrid` (défaut) | Projet Supabase hébergé | Supabase local | Prévisualisation derrière un proxy public |
+| `local` | Projet hébergé relayé par le serveur Next | Supabase local | Le proxy relaie aussi les appels `/auth/v1` et `/rest/v1` |
+| `hosted` | Projet Supabase hébergé | Projet Supabase hébergé | La machine servant l’application atteint le projet |
+
+Le mode `hybrid` existe parce que le proxy de prévisualisation de la
+plateforme **refuse la requête d’authentification relayée par un code HTTP
+403**. Ni l’application, ni Next.js, ni le harnais mock ne produisent de
+403 : le refus vient du proxy, avant que la requête n’atteigne l’application.
+Le navigateur appelant directement le projet Supabase hébergé, il n’est plus
+exposé à ce refus ; le serveur, lui, lit le Supabase local, qu’il peut
+joindre sans sortir du bac à sable.
+
+Les identifiants de connexion sont ceux du projet hébergé, rappelés à l’écran :
 
 | Compte | Mot de passe | Espace |
 | --- | --- | --- |
-| `parent.demo@example.invalid` | `SchoolDemo2026!Parent` | Espace parent |
-| `direction.demo@example.invalid` | `SchoolDemo2026!Direction` | Portail de l’école |
-| `supervision.demo@example.invalid` | `SchoolDemo2026!Supervision` | Supervision globale |
+| `parent.a1@example.invalid` | `SchoolDemo2026!Parent` | Espace parent, deux enfants liés |
+| `direction.a@example.invalid` | `SchoolDemo2026!Direction` | Portail de l’école |
+| `secretariat.a@example.invalid` | `SchoolDemo2026!Secretariat` | Portail de l’école |
+| `comptable.a@example.invalid` | `SchoolDemo2026!Comptable` | Portail de l’école |
+| `enseignant.a@example.invalid` | `SchoolDemo2026!Enseignant` | Espace enseignant |
+| `surveillant.a@example.invalid` | `SchoolDemo2026!Surveillant` | Espace enseignant |
 
 `SUPABASE_INTERNAL_URL` et `SUPABASE_LOCAL_PROXY_TARGET` sont lues **au
 démarrage** : les Omnibus les passer au build uniquement, le serveur
@@ -190,6 +206,36 @@ subsiste en production aucun compte de démonstration à mot de passe connu. La
 procédure de provisionnement reste documentée ici pour qu'un environnement de
 test puisse en créer un à la demande ; ce compte doit être révoqué dès la fin
 de la validation.
+
+### 5 bis. Comptes de démonstration provisionnés
+
+Pour que la connexion soit vérifiable en ligne — la prévisualisation servie
+derrière un proxy public appelle le projet hébergé directement — six comptes
+fictifs de l’école A portent un mot de passe :
+
+| Compte | Rôle | Mot de passe |
+| --- | --- | --- |
+| `parent.a1@example.invalid` | parent, deux enfants liés | `SchoolDemo2026!Parent` |
+| `direction.a@example.invalid` | direction | `SchoolDemo2026!Direction` |
+| `secretariat.a@example.invalid` | secrétariat | `SchoolDemo2026!Secretariat` |
+| `comptable.a@example.invalid` | comptabilité | `SchoolDemo2026!Comptable` |
+| `enseignant.a@example.invalid` | enseignant | `SchoolDemo2026!Enseignant` |
+| `surveillant.a@example.invalid` | surveillant | `SchoolDemo2026!Surveillant` |
+
+Les sept autres comptes du projet hébergé restent sans mot de passe :
+l’isolation entre écoles continue d’être vérifiable.
+
+Ces identifiants sont **fictifs et publiés**. Ils servent à la validation et
+doivent être révoqués à la fin de celle-ci, en remettant `encrypted_password`
+à la chaîne vide :
+
+```sql
+update auth.users set encrypted_password = '' where email like '%.a@example.invalid';
+```
+
+Le mot de passe est stocké en bcrypt (`crypt(..., gen_salt('bf', 10))`), au
+même coût que celui de GoTrue, et chaque compte dispose de sa ligne
+`auth.identities`.
 
 **Téléphone non implémenté à cette étape :** Supabase prend en charge l’OTP téléphone, mais aucun fournisseur SMS ni configuration Auth réelle n’est accessible. Ajouter ce parcours sans le tester créerait une fonctionnalité non fiable et pourrait engendrer des coûts. Il ne sera envisagé qu’après accès à une configuration de test explicite.
 

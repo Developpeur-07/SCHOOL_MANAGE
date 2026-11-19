@@ -61,10 +61,45 @@ export const DIRECTION_CREDENTIALS = Object.freeze({
  * Chaque compte est rattaché à un rôle : c'est ce rôle qui pilote la
  * restitution des données, comme le ferait la RLS en production.
  */
+/**
+ * Comptes de démonstration du projet hébergé.
+ *
+ * Ils reprennent les identifiants provisionnés dans le projet Supabase, avec
+ * les mêmes mots de passe : la prévisualisation et le projet hébergé
+ * s'authentifient donc de la même façon.
+ */
+const HOSTED_ACCOUNTS = {
+  'parent.a1@example.invalid': {
+    password: 'SchoolDemo2026!Parent',
+    userId: 'a0000000-0000-4000-8000-000000000010',
+  },
+  'direction.a@example.invalid': {
+    password: 'SchoolDemo2026!Direction',
+    userId: 'a0000000-0000-4000-8000-000000000001',
+  },
+  'secretariat.a@example.invalid': {
+    password: 'SchoolDemo2026!Secretariat',
+    userId: 'a0000000-0000-4000-8000-000000000002',
+  },
+  'comptable.a@example.invalid': {
+    password: 'SchoolDemo2026!Comptable',
+    userId: 'a0000000-0000-4000-8000-000000000003',
+  },
+  'enseignant.a@example.invalid': {
+    password: 'SchoolDemo2026!Enseignant',
+    userId: 'a0000000-0000-4000-8000-000000000004',
+  },
+  'surveillant.a@example.invalid': {
+    password: 'SchoolDemo2026!Surveillant',
+    userId: 'a0000000-0000-4000-8000-000000000005',
+  },
+};
+
 const ACCOUNTS = {
   [DEMO_EMAIL]: { password: DEMO_PASSWORD, userId: PARENT_ID },
   [SUPERVISION_EMAIL]: { password: SUPERVISION_PASSWORD, userId: SUPERVISION_ID },
   [DIRECTION_EMAIL]: { password: DIRECTION_PASSWORD, userId: DIRECTION_ID },
+  ...HOSTED_ACCOUNTS,
 };
 
 const TABLES = {
@@ -117,6 +152,44 @@ const TABLES = {
       school_id: OTHER_SCHOOL_ID,
       role: 'teacher',
       full_name: 'Enseignant Démo B',
+      is_active: true,
+    },
+    // Profils des comptes de démonstration du projet hébergé : ils portent les
+    // mêmes identifiants, pour que la session Serve et la session navigateur
+    // décrivent le même profil.
+    {
+      id: 'a0000000-0000-4000-8000-000000000001',
+      school_id: SCHOOL_ID,
+      role: 'direction',
+      full_name: 'Direction Démo Fictive',
+      is_active: true,
+    },
+    {
+      id: 'a0000000-0000-4000-8000-000000000002',
+      school_id: SCHOOL_ID,
+      role: 'secretary',
+      full_name: 'Secrétariat Démo Fictif',
+      is_active: true,
+    },
+    {
+      id: 'a0000000-0000-4000-8000-000000000003',
+      school_id: SCHOOL_ID,
+      role: 'accountant',
+      full_name: 'Comptabilité Démo Fictive',
+      is_active: true,
+    },
+    {
+      id: 'a0000000-0000-4000-8000-000000000004',
+      school_id: SCHOOL_ID,
+      role: 'teacher',
+      full_name: 'Enseignant Démo Fictif',
+      is_active: true,
+    },
+    {
+      id: 'a0000000-0000-4000-8000-000000000005',
+      school_id: SCHOOL_ID,
+      role: 'supervisor',
+      full_name: 'Surveillant Démo Fictif',
       is_active: true,
     },
   ],
