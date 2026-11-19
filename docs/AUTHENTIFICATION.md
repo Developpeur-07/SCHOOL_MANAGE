@@ -158,6 +158,20 @@ SUPABASE_LOCAL_PROXY_TARGET=http://127.0.0.1:54321 \
 npm run start
 ```
 
+En pratique, `npm run preview` fait le montage complet : il construit
+l’application avec la bonne URL publique, démarre le Supabase local, attend
+qu’il réponde, puis sert l’application sur le port 3200. L’origine publique
+est déduite de `E2B_SANDBOX_ID` ; en dehors d’un environnement de
+prévisualisation, le navigateur et le serveur partageant la machine, l’URL
+locale est utilisée directement. Les identifiants de connexion sont ceux du
+harnais E2E, rappelés à l’écran :
+
+| Compte | Mot de passe | Espace |
+| --- | --- | --- |
+| `parent.demo@example.invalid` | `SchoolDemo2026!Parent` | Espace parent |
+| `direction.demo@example.invalid` | `SchoolDemo2026!Direction` | Portail de l’école |
+| `supervision.demo@example.invalid` | `SchoolDemo2026!Supervision` | Supervision globale |
+
 `SUPABASE_INTERNAL_URL` et `SUPABASE_LOCAL_PROXY_TARGET` sont lues **au
 démarrage** : les Omnibus les passer au build uniquement, le serveur
 retrouverait alors l’URL publique et joindrait un hôte injoignable.
