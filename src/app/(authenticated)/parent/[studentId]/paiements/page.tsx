@@ -1,7 +1,7 @@
 import { Receipt, Wallet } from 'lucide-react';
 import { requireChildAccess } from '@/modules/parent/application/child-context';
 import { getChildFees, getChildPayments } from '@/modules/parent/data/child-finance.supabase';
-import { applyPaymentsToFees, summarizeFinance } from '@/modules/parent/domain/finance';
+import { allocatePaymentsToFees, summarizeFinance } from '@/modules/parent/domain/finance';
 import { EmptyState } from '@/modules/parent/ui/empty-state';
 import { StatCard } from '@/shared/ui/stat-card';
 import { messages } from '@/shared/config/messages';
@@ -21,11 +21,12 @@ export default async function PaymentsPage({ params }: PaymentsPageProps) {
     getChildPayments(child.id, 50),
   ]);
 
-  const feesWithStatus = applyPaymentsToFees(fees, payments);
+  const { fees: feesWithStatus, unallocatedPaidMinor } = allocatePaymentsToFees(fees, payments);
   const summary = summarizeFinance(
     feesWithStatus,
     payments,
     new Date().toISOString().slice(0, 10),
+    unallocatedPaidMinor,
   );
   const currency = profile.schoolCurrency;
   const childName = `${child.firstName} ${child.lastName}`;
@@ -70,6 +71,19 @@ export default async function PaymentsPage({ params }: PaymentsPageProps) {
               }
             />
           </section>
+
+          {summary.unallocatedPaidMinor > 0 ? (
+            <p className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              {messages.parent.payments.unallocated.replace(
+                '{amount}',
+                formatMinorAmount(
+                  summary.unallocatedPaidMinor,
+                  currency,
+                  profile.schoolLocale,
+                ),
+              )}
+            </p>
+          ) : null}
 
           <section
             aria-labelledby="payments-fees"

@@ -152,6 +152,27 @@ L’audit responsive vérifie, pour les cinq onglets et de 320 px à 1440 px :
 aucun débordement horizontal, aucune cible interactive sous 44 px de hauteur et
 aucun champ de saisie sous 16 px.
 
+## 7 bis. Cohérence des chiffres affichés
+
+Trois règles ont été ajoutées après une revue critique de la logique : un
+chiffre affiché ne doit jamais contredire le détail qu'il accompagne.
+
+- **Le solde affiché est la somme des restes dus** portés par les frais, et
+  non la différence entre le total des frais et le total des paiements. Les
+  deux valeurs divergeaient dès qu'un règlement n'était rattaché à aucun frais
+  ou dépassait le montant dû : le parent lisait « 20 000 à payer » alors que
+  le détail des frais indiquait « 50 000 à payer ». Les montants reçus sans
+  affectation sont désormais signalés à part, et un trop-perçu n'est jamais
+  soustrait deux fois.
+- **Une lecture tronquée est signalée.** Les notes et les présences sont lues
+  avec une limite de lignes. Lorsque la limite est atteinte, la moyenne et le
+  taux de présence ne portent que sur une partie de l'historique : l'écran
+  affiche un bandeau plutôt que de présenter un chiffre partiel comme
+  complet.
+- **Un rôle hors enum est rejeté.** Les rôles lus en base sont validés avant
+  d'entrer dans un calcul : une valeur inattendue ne crée plus de rubrique
+  fantôme dans le décompte par rôle.
+
 ## 8. Limites connues
 
 - Les données ne sont pas mises en cache hors ligne : le service worker de
@@ -163,3 +184,7 @@ aucun champ de saisie sous 16 px.
   mais aucun reçu téléchargeable (exclu de la V1).
 - La moyenne générale ne pondère pas les évaluations : aucun coefficient
   n’est saisi par l’école en V1.
+- Le taux de présence compte les absences excusées dans le total des jours
+  suivis : une absence pour maladie réduit donc le taux. Le décompte par
+  statut est affiché à côté, ce qui permet de lire les deux chiffres ; la
+  convention d'exclusion reste à confirmer avec les écoles.

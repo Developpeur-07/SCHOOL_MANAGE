@@ -14,7 +14,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
   const { studentId } = await params;
   const { child } = await requireChildAccess(studentId);
 
-  const grades = await getChildGrades(child.id, 100);
+  const { grades, truncated } = await getChildGrades(child.id, 100);
   const groups = groupGradesBySubject(grades);
   const average = computeAverageOnTwenty(grades);
   const childName = `${child.firstName} ${child.lastName}`;
@@ -24,6 +24,12 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
       <p className="text-sm text-slate-600">
         {messages.parent.results.intro.replace('{studentName}', childName)}
       </p>
+
+      {truncated ? (
+        <p className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {messages.parent.partialGrades}
+        </p>
+      ) : null}
 
       {grades.length === 0 ? (
         <EmptyState

@@ -2,10 +2,22 @@ import { cache } from 'react';
 import { createSupabaseServerClient } from '@/shared/supabase/server';
 import { mapAttendanceRow, type ParentAttendance } from '../domain/attendance';
 
+/**
+ * Presences d'un enfant, avec la mention d'une lecture tronquee.
+ *
+ * Comme pour les notes, le taux de presence calcule sur une lecture
+ * tronquee ne doit pas etre presente comme un taux complet.
+ */
+export interface ChildAttendanceResult {
+  attendance: ParentAttendance[];
+  /** La lecture a atteint la limite : le taux de presence est partiel. */
+  truncated: boolean;
+}
+
 async function readChildAttendance(
   studentId: string,
   limit: number,
-): Promise<ParentAttendance[]> {
+): Promise<ChildAttendanceResult> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -17,7 +29,10 @@ async function readChildAttendance(
 
   if (error) throw new Error('ATTENDANCE_UNAVAILABLE');
 
-  return (data ?? []).map(mapAttendanceRow);
+  return {
+    attendance: (data ?? []).map(mapAttendanceRow),
+    truncated: (data ?? []).length >= limit,
+  };
 }
 
 export const getChildAttendance = cache(readChildAttendance);

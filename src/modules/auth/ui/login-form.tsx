@@ -16,6 +16,7 @@ const MESSAGES_PAR_KIND: Record<LoginFailureKind, string> = {
   emailNotConfirmed: messages.auth.emailNotConfirmed,
   rateLimited: messages.auth.rateLimited,
   serviceUnavailable: messages.auth.serviceUnavailable,
+  requestRefused: messages.auth.requestRefused,
   network: messages.auth.networkError,
   unknown: messages.auth.unknownError,
 };

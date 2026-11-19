@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import { isAppRole } from '@/modules/auth/domain/roles';
 import { createSupabaseServerClient } from '@/shared/supabase/server';
 import {
   buildSupervisionOverview,
@@ -73,9 +74,13 @@ function mapProfileRow(row: unknown): SupervisionProfileRow {
   const role = profile.role;
   if (typeof role !== 'string') throw new Error('SUPERVISION_ROW_INVALID_ROLE');
 
+  // Le rôle est validé, pas transtypé : une valeur hors enum venue de la base
+  // ne doit pas créer une rubrique de rôle incohérente dans le décompte.
+  if (!isAppRole(role)) throw new Error('SUPERVISION_ROW_INVALID_ROLE');
+
   return {
     schoolId: readOptionalString(profile.school_id, 'SCHOOL_ID'),
-    role: role as SupervisionProfileRow['role'],
+    role,
     isActive: profile.is_active === true,
   };
 }

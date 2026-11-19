@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  allocatePaymentsToFees,
   applyPaymentsToFees,
   mapFeeRow,
   mapPaymentRow,
@@ -157,7 +158,77 @@ describe('summarizeFinance', () => {
       totalPaidMinor: 50000,
       balanceMinor: 30000,
       overdueCount: 0,
+      unallocatedPaidMinor: 0,
     });
+  });
+
+  it('garde le solde cohérent avec le détail des frais', () => {
+    const frais: ParentFee[] = [
+      { id: 'f1', label: 'Frais 1', amountMinor: 50000, dueOn: '2026-10-01' },
+      { id: 'f2', label: 'Frais 2', amountMinor: 30000, dueOn: '2026-12-01' },
+    ];
+    const paiements: ParentPayment[] = [
+      {
+        id: 'p1',
+        receiptNumber: 'REC-1',
+        amountMinor: 20000,
+        paidAt: '2026-11-02T09:00:00Z',
+        method: 'cash',
+        note: null,
+        feeId: 'f1',
+      },
+      {
+        id: 'p2',
+        receiptNumber: 'REC-2',
+        amountMinor: 10000,
+        paidAt: '2026-11-03T09:00:00Z',
+        method: 'cash',
+        note: null,
+        feeId: null,
+      },
+    ];
+
+    const { fees, unallocatedPaidMinor } = allocatePaymentsToFees(frais, paiements);
+    const summary = summarizeFinance(fees, paiements, '2026-11-07', unallocatedPaidMinor);
+
+    // Le solde doit egaler la somme des restes dus affiches sur les frais.
+    const sommeRestes = fees.reduce((total, fee) => total + fee.remainingMinor, 0);
+    expect(summary.balanceMinor).toBe(sommeRestes);
+
+    // Un versement sans frais reste comptabilise, mais ne reduit aucun frais.
+    expect(summary.unallocatedPaidMinor).toBe(10000);
+    expect(summary.totalPaidMinor).toBe(20000);
+    expect(fees[0].remainingMinor).toBe(30000);
+  });
+
+  it('impute un règlement sans frais avant un règlement sans rattachement', () => {
+    const frais: ParentFee[] = [
+      { id: 'f1', label: 'Frais 1', amountMinor: 50000, dueOn: '2026-10-01' },
+    ];
+    const paiements: ParentPayment[] = [
+      {
+        id: 'p1',
+        receiptNumber: 'REC-1',
+        amountMinor: 5000,
+        paidAt: '2026-11-02T09:00:00Z',
+        method: 'cash',
+        note: null,
+        feeId: null,
+      },
+      {
+        id: 'p2',
+        receiptNumber: 'REC-2',
+        amountMinor: 20000,
+        paidAt: '2026-11-03T09:00:00Z',
+        method: 'cash',
+        note: null,
+        feeId: 'f1',
+      },
+    ];
+
+    const { fees, unallocatedPaidMinor } = allocatePaymentsToFees(frais, paiements);
+    expect(fees[0].paidMinor).toBe(20000);
+    expect(unallocatedPaidMinor).toBe(5000);
   });
 
   it('compte une échéance dépassée non réglée', () => {

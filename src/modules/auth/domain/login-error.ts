@@ -11,6 +11,7 @@ export type LoginFailureKind =
   | 'emailNotConfirmed'
   | 'rateLimited'
   | 'serviceUnavailable'
+  | 'requestRefused'
   | 'network'
   | 'unknown';
 
@@ -65,6 +66,14 @@ export function classifyLoginFailure(
 
   if (status === 429 || message.includes('rate limit') || message.includes('too many requests')) {
     return { kind: 'rateLimited', reference };
+  }
+
+  // Un refus (403) vient d'une couche en amont de l'application : proxy,
+  // CDN ou pare-feu. Ce n'est ni un identifiant invalide, ni une panne du
+  // service d'authentification : le message doit le dire, sinon le diagnostic
+  // est impossible et l'utilisateur croit a son mot de passe.
+  if (status === 403 || message.includes('forbidden')) {
+    return { kind: 'requestRefused', reference };
   }
 
   if (

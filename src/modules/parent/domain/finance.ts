@@ -36,6 +36,13 @@ export interface FinanceSummary {
   totalPaidMinor: number;
   balanceMinor: number;
   overdueCount: number;
+  /**
+   * Paiements reçus sans être rattachés à un frais (avance, versement non
+   * affecté). Ces montants sont comptés dans `totalPaidMinor` et dans le
+   * solde, mais ils ne réduisent aucun frais : les signaler évite qu'un
+   * parent croie à une somme due alors qu'elle a déjà été versée.
+   */
+  unallocatedPaidMinor: number;
 }
 
 export const PAYMENT_METHODS = ['cash', 'bank_transfer', 'cheque', 'other'] as const;
@@ -117,19 +124,56 @@ export function mapPaymentRow(row: unknown): ParentPayment {
   };
 }
 
-/** Associe les paiements aux frais et déduit l’état de règlement de chacun. */
-export function applyPaymentsToFees(
+/**
+ * Associe les paiements aux frais et déduit l’état de règlement de chacun.
+ *
+ * Un paiement est imputé sur un frais tant qu’il reste du dû sur ce frais ;
+ * le surplus et les paiements sans frais ne sont pas perdus : ils sont
+ * retournés à part pour que le résumé reste cohérent avec le détail.
+ */
+export interface PaymentAllocation {
+  fees: ParentFeeWithStatus[];
+  /** Montants reçus au-delà du dû des frais, ou sans frais rattaché. */
+  unallocatedPaidMinor: number;
+}
+
+export function allocatePaymentsToFees(
   fees: ParentFee[],
   payments: ParentPayment[],
-): ParentFeeWithStatus[] {
-  const paidByFee = new Map<string, number>();
+): PaymentAllocation {
+  // Reste à imputer, par frais.
+  const remainingByFee = new Map<string, number>();
+  for (const fee of fees) remainingByFee.set(fee.id, fee.amountMinor);
 
+  const paidByFee = new Map<string, number>();
+  let unallocatedPaidMinor = 0;
+
+  // L'ordre des paiements n'a pas d'effet sur le résultat : chaque paiement
+  // est imputé sur le seul frais qu'il vise, et le total imputé sur un frais
+  // ne dépend que de l'ensemble des paiements qui le concernent.
   for (const payment of payments) {
-    if (!payment.feeId) continue;
-    paidByFee.set(payment.feeId, (paidByFee.get(payment.feeId) ?? 0) + payment.amountMinor);
+    if (!payment.feeId) {
+      unallocatedPaidMinor += payment.amountMinor;
+      continue;
+    }
+
+    const remaining = remainingByFee.get(payment.feeId);
+    // Un paiement rattaché à un frais absent de la liste lue reste imputé
+    // comme non affecté : il ne peut pas réduire un frais invisible.
+    if (remaining === undefined) {
+      unallocatedPaidMinor += payment.amountMinor;
+      continue;
+    }
+
+    const imputed = Math.min(remaining, payment.amountMinor);
+    paidByFee.set(payment.feeId, (paidByFee.get(payment.feeId) ?? 0) + imputed);
+    remainingByFee.set(payment.feeId, remaining - imputed);
+
+    // Le surplus du paiement (au-delà du dû du frais) n’est pas perdu.
+    unallocatedPaidMinor += payment.amountMinor - imputed;
   }
 
-  return fees.map((fee) => {
+  const feesWithStatus = fees.map((fee) => {
     const paidMinor = Math.min(paidByFee.get(fee.id) ?? 0, fee.amountMinor);
     const remainingMinor = fee.amountMinor - paidMinor;
     const status: FeeStatus =
@@ -137,15 +181,38 @@ export function applyPaymentsToFees(
 
     return { ...fee, paidMinor, remainingMinor, status };
   });
+
+  return { fees: feesWithStatus, unallocatedPaidMinor };
 }
 
+/**
+ * Applique les paiements aux frais et renvoie seulement l’état des frais.
+ *
+ * Pour le résumé financier, préférer `allocatePaymentsToFees` : elle expose
+ * aussi les montants non affectés, que le résumé doit signaler.
+ */
+export function applyPaymentsToFees(
+  fees: ParentFee[],
+  payments: ParentPayment[],
+): ParentFeeWithStatus[] {
+  return allocatePaymentsToFees(fees, payments).fees;
+}
+
+/**
+ * Résumé financier de l’espace parent.
+ *
+ * Le solde est la somme des restes dus affichés sur les frais : c’est la
+ * seule valeur cohérente avec le détail affiché en dessous. Les montants
+ * reçus sans frais rattaché (ou en excès sur un frais) sont signalés à part.
+ */
 export function summarizeFinance(
   fees: ParentFeeWithStatus[],
   payments: ParentPayment[],
   today: string,
+  unallocatedPaidMinor = 0,
 ): FinanceSummary {
   const totalDueMinor = fees.reduce((total, fee) => total + fee.amountMinor, 0);
-  const totalPaidMinor = payments.reduce((total, payment) => total + payment.amountMinor, 0);
+  const totalPaidMinor = fees.reduce((total, fee) => total + fee.paidMinor, 0);
 
   return {
     totalDueMinor,
@@ -154,5 +221,6 @@ export function summarizeFinance(
     overdueCount: fees.filter(
       (fee) => fee.status !== 'paid' && fee.dueOn < today,
     ).length,
+    unallocatedPaidMinor,
   };
 }

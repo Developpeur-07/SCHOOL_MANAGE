@@ -4,6 +4,7 @@ import {
   canAccessArea,
   getRoleArea,
   getRoleHomePath,
+  isAppRole,
   isSuperAdmin,
   parseAppRole,
   type AppRole,
@@ -33,6 +34,18 @@ describe('redirections et zones des rôles', () => {
       }
     },
   );
+
+  it('teste la validité d’un rôle sans lever d’erreur', () => {
+    for (const role of APP_ROLES) expect(isAppRole(role)).toBe(true);
+
+    // Une valeur venue de la base peut être absente de l'enum : elle doit
+    // être rejetée sans faire tomber la lecture entière.
+    expect(isAppRole('tresorier')).toBe(false);
+    expect(isAppRole('')).toBe(false);
+    expect(isAppRole(null)).toBe(false);
+    expect(isAppRole(undefined)).toBe(false);
+    expect(isAppRole(42)).toBe(false);
+  });
 
   it('accepte exactement les sept rôles du schéma', () => {
     expect(APP_ROLES).toHaveLength(7);

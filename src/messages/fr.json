@@ -197,6 +197,7 @@
     "emailNotConfirmed": "Votre adresse e-mail n’est pas encore confirmée. Contactez votre école.",
     "rateLimited": "Trop de tentatives de connexion. Patientez quelques minutes puis réessayez.",
     "serviceUnavailable": "Le service de connexion est momentanément indisponible. Réessayez dans quelques instants.",
+    "requestRefused": "La connexion a été refusée par un service intermédiaire. Réessayez dans quelques instants, ou contactez votre école.",
     "networkError": "Impossible de joindre le service de connexion. Vérifiez votre connexion internet puis réessayez.",
     "unknownError": "La connexion a échoué. Réessayez, ou contactez votre école si le problème persiste.",
     "errorReference": "Référence technique",
@@ -310,7 +311,8 @@
       "balance": "Reste à payer",
       "overdue": "Dont {count} échéance(s) dépassée(s)",
       "empty": "Aucun frais enregistré pour {studentName}.",
-      "emptyHint": "Les frais et les reçus apparaissent après saisie par l’école."
+      "emptyHint": "Les frais et les reçus apparaissent après saisie par l’école.",
+      "unallocated": "Dont {amount} reçus sans être rattachés à un frais."
     },
     "news": {
       "title": "Infos",
@@ -321,7 +323,10 @@
       "empty": "Aucune information publiée pour {studentName}.",
       "emptyHint": "Les annonces adressées à votre enfant apparaissent ici.",
       "noNotifications": "Aucune notification pour le moment."
-    }
+    },
+    "partialStats": "Statistiques partielles : seules les entrées les plus récentes sont affichées.",
+    "partialGrades": "Résultats partiels : seules les évaluations les plus récentes sont affichées.",
+    "partialAttendance": "Assiduité partielle : seules les entrées les plus récentes sont affichées."
   },
   "school": {
     "title": "Portail école",

@@ -15,7 +15,7 @@ export default async function SchoolLifePage({ params }: SchoolLifePageProps) {
   const { studentId } = await params;
   const { child } = await requireChildAccess(studentId);
 
-  const attendance = await getChildAttendance(child.id, 120);
+  const { attendance, truncated } = await getChildAttendance(child.id, 120);
   const summary = summarizeAttendance(attendance);
   const childName = `${child.firstName} ${child.lastName}`;
 
@@ -24,6 +24,12 @@ export default async function SchoolLifePage({ params }: SchoolLifePageProps) {
       <p className="text-sm text-slate-600">
         {messages.parent.attendance.intro.replace('{studentName}', childName)}
       </p>
+
+      {truncated ? (
+        <p className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {messages.parent.partialAttendance}
+        </p>
+      ) : null}
 
       {attendance.length === 0 ? (
         <EmptyState

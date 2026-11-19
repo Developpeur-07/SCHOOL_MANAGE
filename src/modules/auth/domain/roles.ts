@@ -39,6 +39,17 @@ export function parseAppRole(value: unknown): AppRole {
   throw new Error('APP_ROLE_INVALID');
 }
 
+/**
+ * Teste si une valeur est un rôle connu de l'application.
+ *
+ * Contrairement à `parseAppRole`, cette fonction ne lève pas : elle sert à
+ * filtrer les valeurs venues de la base, qui doivent être validées avant
+ * d'entrer dans un calcul ou un affichage.
+ */
+export function isAppRole(value: unknown): value is AppRole {
+  return typeof value === 'string' && APP_ROLES.includes(value as AppRole);
+}
+
 export function getRoleArea(role: AppRole): RoleArea {
   return ROLE_AREAS[role];
 }

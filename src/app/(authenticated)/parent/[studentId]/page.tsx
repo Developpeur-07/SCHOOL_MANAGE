@@ -7,7 +7,7 @@ import { getChildFees, getChildPayments } from '@/modules/parent/data/child-fina
 import { getChildGrades } from '@/modules/parent/data/child-grades.supabase';
 import { computeAverageOnTwenty } from '@/modules/parent/domain/grades';
 import { summarizeAttendance } from '@/modules/parent/domain/attendance';
-import { applyPaymentsToFees, summarizeFinance } from '@/modules/parent/domain/finance';
+import { allocatePaymentsToFees, summarizeFinance } from '@/modules/parent/domain/finance';
 import { getParentTabHref } from '@/modules/parent/domain/tabs';
 import { EmptyState } from '@/modules/parent/ui/empty-state';
 import { StatCard } from '@/shared/ui/stat-card';
@@ -23,7 +23,7 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
   const { studentId } = await params;
   const { child, children, profile } = await requireChildAccess(studentId);
 
-  const [grades, attendance, fees, payments, announcements] = await Promise.all([
+  const [gradesResult, attendanceResult, fees, payments, announcements] = await Promise.all([
     getChildGrades(child.id, 50),
     getChildAttendance(child.id, 60),
     getChildFees(child.id, 50),
@@ -31,13 +31,20 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
     getChildAnnouncements(20),
   ]);
 
+  const grades = gradesResult.grades;
+  const attendance = attendanceResult.attendance;
+  // Une lecture tronquee rend la moyenne et le taux partiels : l'ecran le
+  // signale plutot que de presenter un chiffre incomplet comme complet.
+  const statsTruncated = gradesResult.truncated || attendanceResult.truncated;
+
   const average = computeAverageOnTwenty(grades);
   const attendanceSummary = summarizeAttendance(attendance);
-  const feesWithStatus = applyPaymentsToFees(fees, payments);
+  const { fees: feesWithStatus, unallocatedPaidMinor } = allocatePaymentsToFees(fees, payments);
   const financeSummary = summarizeFinance(
     feesWithStatus,
     payments,
     new Date().toISOString().slice(0, 10),
+    unallocatedPaidMinor,
   );
   const currency = profile.schoolCurrency;
 
@@ -47,6 +54,12 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
 
   return (
     <div className="space-y-5">
+      {statsTruncated ? (
+        <p className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {messages.parent.partialStats}
+        </p>
+      ) : null}
+
       <section aria-labelledby="resume-stats" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <h2 id="resume-stats" className="sr-only">
           {messages.parent.resume.title}

@@ -229,12 +229,26 @@ export function buildSupervisionOverview(
     if (school) school.attendanceRecordsCount += 1;
   }
 
+  // Imputation des paiements sur les frais, par école.
+  //
+  // Un paiement est imputé tant qu'il reste du dû sur le frais visé. Le
+  // surplus, comme un paiement sans frais, reste encaissé par l'école : il
+  // compte dans les encaissements mais ne réduit aucun impayé.
+  const remainingByFee = new Map<string, number>();
+  for (const fee of input.fees) remainingByFee.set(fee.id, fee.amountMinor);
+
   const paidByFee = new Map<string, number>();
   for (const payment of input.payments) {
     const school = schools.get(payment.schoolId);
     if (school) school.collectedAmountMinor += payment.amountMinor;
     if (!payment.feeId) continue;
-    paidByFee.set(payment.feeId, (paidByFee.get(payment.feeId) ?? 0) + payment.amountMinor);
+
+    const remaining = remainingByFee.get(payment.feeId);
+    if (remaining === undefined) continue;
+
+    const imputed = Math.min(remaining, payment.amountMinor);
+    paidByFee.set(payment.feeId, (paidByFee.get(payment.feeId) ?? 0) + imputed);
+    remainingByFee.set(payment.feeId, remaining - imputed);
   }
 
   for (const fee of input.fees) {
