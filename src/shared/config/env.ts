@@ -3,6 +3,17 @@ export interface SupabasePublicConfig {
   anonKey: string;
 }
 
+/**
+ * Nom du cookie de session.
+ *
+ * `@supabase/ssr` dérive par défaut ce nom de l’hôte Supabase. Dès que le
+ * navigateur et le serveur ne joignent pas le même hôte — cas d’un relais
+ * de prévisualisation — le cookie écrit par l’un n’est plus lu par l’autre.
+ * Un nom fixe, partagé par tous les clients, rend la session indépendante de
+ * l’URL de déploiement.
+ */
+export const SUPABASE_COOKIE_NAME = 'sb-school-manage-auth-token';
+
 export function hasSupabasePublicConfig(): boolean {
   try {
     getSupabasePublicConfig();
@@ -54,5 +65,32 @@ export function getSupabasePublicConfig(): SupabasePublicConfig {
   }
 
   assertNotSecretKey(anonKey);
+  return { url: parsedUrl.toString().replace(/\/$/, ''), anonKey };
+}
+
+/**
+ * Configuration Supabase utilisée par le code serveur.
+ *
+ * Elle reprend l’URL publique, sauf si `SUPABASE_INTERNAL_URL` est définie :
+ * le navigateur passe alors par une origine publique relayée vers le
+ * Supabase local, tandis que le serveur joint directement cet hôte interne.
+ */
+export function getSupabaseServerConfig(): SupabasePublicConfig {
+  const { url, anonKey } = getSupabasePublicConfig();
+  const internalUrl = process.env.SUPABASE_INTERNAL_URL;
+
+  if (!internalUrl) return { url, anonKey };
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(internalUrl);
+  } catch {
+    throw new Error('SUPABASE_INTERNAL_URL_INVALID');
+  }
+
+  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+    throw new Error('SUPABASE_INTERNAL_URL_INVALID');
+  }
+
   return { url: parsedUrl.toString().replace(/\/$/, ''), anonKey };
 }

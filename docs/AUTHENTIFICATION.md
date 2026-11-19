@@ -121,6 +121,50 @@ npm run dev
 
 La prévisualisation sans variables affiche volontairement « Configuration Supabase requise » et désactive le formulaire plutôt que de simuler une connexion.
 
+### 4 bis. Prévisualisation reliée à un Supabase local
+
+Une prévisualisation servie derrière un proxy public (hôte de prévisualisation,
+tunnel, passerelle) ne peut pas laisser le navigateur joindre `127.0.0.1` :
+c’est l’ordinateur du visiteur qui contacte cette adresse, pas le serveur.
+Trois variables facultatives résolvent ce cas sans toucher au projet hébergé :
+
+| Variable | Rôle |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Origine publique par laquelle le navigateur joint l’application. Les appels `/auth/v1` et `/rest/v1` y sont réécrits. |
+| `SUPABASE_LOCAL_PROXY_TARGET` | Cible du relais : le serveur Next relaie `/auth/v1/:path*` et `/rest/v1/:path*` vers ce Supabase local. Sans cette variable, aucune réécriture n’existe. |
+| `SUPABASE_INTERNAL_URL` | Hôte joint **par le code serveur**. Sans elle, le serveur utilise l’URL publique et ne peut pas joindre un hôte interne. |
+
+Le cookie de session ne peut pas dépendre de l’URL : `@supabase/ssr` dérive par
+défaut son nom de l’hôte Supabase, ce qui rendrait le cookie écrit par le
+navigateur illisible par le serveur dès que les deux ne joignent pas le même
+hôte. `SUPABASE_COOKIE_NAME` (`src/shared/config/env.ts`) fixe donc un nom
+unique, `sb-school-manage-auth-token`, partagé par le client navigateur, le
+client serveur et le proxy. La session devient indépendante de l’URL de
+déploiement.
+
+Exemple de prévisualisation reliée au harnais E2E :
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://apercu.exemple.test \
+NEXT_PUBLIC_SUPABASE_ANON_KEY=cle-publique-locale-de-test \
+SUPABASE_INTERNAL_URL=http://127.0.0.1:54321 \
+SUPABASE_LOCAL_PROXY_TARGET=http://127.0.0.1:54321 \
+npm run build
+
+NEXT_PUBLIC_SUPABASE_URL=https://apercu.exemple.test \
+NEXT_PUBLIC_SUPABASE_ANON_KEY=cle-publique-locale-de-test \
+SUPABASE_INTERNAL_URL=http://127.0.0.1:54321 \
+SUPABASE_LOCAL_PROXY_TARGET=http://127.0.0.1:54321 \
+npm run start
+```
+
+`SUPABASE_INTERNAL_URL` et `SUPABASE_LOCAL_PROXY_TARGET` sont lues **au
+démarrage** : les Omnibus les passer au build uniquement, le serveur
+retrouverait alors l’URL publique et joindrait un hôte injoignable.
+
+En production, aucune de ces variables n’est définie : le relais est absent et
+le serveur joint le projet Supabase hébergé, comme avant.
+
 ## 5. Comptes de démonstration et téléphone
 
 Les lignes `auth.users` du seed de l’étape 2 ont un mot de passe vide et ne permettent pas de se connecter. Elles servent uniquement aux contraintes SQL. Pour tester le formulaire réel, il faut provisionner les comptes via Supabase Auth dans un environnement local autorisé et conserver la correspondance `auth.users.id = profiles.id`.

@@ -1,8 +1,9 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import {
-  getSupabasePublicConfig,
+  getSupabaseServerConfig,
   hasSupabasePublicConfig,
+  SUPABASE_COOKIE_NAME,
 } from '@/shared/config/env';
 
 export async function proxy(request: NextRequest) {
@@ -10,8 +11,9 @@ export async function proxy(request: NextRequest) {
 
   if (!hasSupabasePublicConfig()) return response;
 
-  const { url, anonKey } = getSupabasePublicConfig();
+  const { url, anonKey } = getSupabaseServerConfig();
   const supabase = createServerClient(url, anonKey, {
+    cookieOptions: { name: SUPABASE_COOKIE_NAME },
     cookies: {
       getAll() {
         return request.cookies.getAll();
