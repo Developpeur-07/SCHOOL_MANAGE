@@ -114,7 +114,7 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
                   <span className="block truncate text-sm font-semibold text-slate-900">
                     {grade.subjectName}
                   </span>
-                  <span className="block truncate text-xs text-slate-500">
+                  <span className="block truncate text-xs text-slate-600">
                     {grade.evaluationLabel} · {grade.periodName}
                   </span>
                 </span>
@@ -176,7 +176,7 @@ export default async function ChildHomePage({ params }: ChildHomePageProps) {
             {latestAnnouncements.map((announcement) => (
               <li key={announcement.id} className="py-2">
                 <span className="block text-sm font-semibold text-slate-900">{announcement.title}</span>
-                <span className="mt-0.5 block text-xs text-slate-500">
+                <span className="mt-0.5 block text-xs text-slate-600">
                   {announcement.publishedAt ? formatShortDate(announcement.publishedAt) : ''}
                 </span>
               </li>

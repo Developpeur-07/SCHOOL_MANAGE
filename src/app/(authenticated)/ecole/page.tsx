@@ -21,7 +21,7 @@ export default function SchoolHomePage() {
             key={titre}
             className="flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4"
           >
-            <Icone aria-hidden="true" className="size-5 shrink-0 text-slate-500" />
+            <Icone aria-hidden="true" className="size-5 shrink-0 text-slate-600" />
             <span className="text-sm font-semibold text-slate-700">{titre}</span>
           </li>
         ))}

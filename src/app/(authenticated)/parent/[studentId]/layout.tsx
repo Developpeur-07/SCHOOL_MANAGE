@@ -29,7 +29,7 @@ export default async function ChildLayout({ children, params }: ChildLayoutProps
 
       <ParentTabs studentId={currentChild.id} />
 
-      <p className="mt-3 text-sm text-slate-500">{messages.parent.readOnlyNotice}</p>
+      <p className="mt-3 text-sm text-slate-600">{messages.parent.readOnlyNotice}</p>
 
       {children}
     </>

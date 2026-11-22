@@ -16,7 +16,11 @@ export async function mesurer(page) {
         style.display !== 'none' &&
         style.visibility !== 'hidden' &&
         rect.width > 0 &&
-        rect.height > 0
+        rect.height > 0 &&
+        // Un élément masqué aux lecteurs d'écran n'est pas une cible
+        // accessible à la personne : il ne peut pas être actionné.
+        element.getAttribute('aria-hidden') !== 'true' &&
+        element.closest('[aria-hidden="true"]') === null
       );
     });
 

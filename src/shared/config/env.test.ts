@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   getSupabasePublicConfig,
-  getSupabaseServerConfig,
   hasSupabasePublicConfig,
   SUPABASE_COOKIE_NAME,
 } from './env';
+import { getSupabaseServerConfig } from './env-server';
 
 const originalUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const originalKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

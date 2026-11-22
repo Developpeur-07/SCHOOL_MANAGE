@@ -270,7 +270,8 @@ SCHOOL_MANAGE/
 │   ├── PWA.md                             # Étape 4
 │   ├── ESPACE-PARENT.md                   # Étape 5
 │   ├── SUPERVISION.md                     # Étape 6
-│   └── SECURITE.md                        # Étape 2
+│   ├── SECURITE.md                        # Étape 2
+│   └── MISE-EN-LIGNE.md                   # Mise en conformité avant mise en ligne
 ├── public/
 │   ├── icons/                             # Icônes PWA et maskables — étape 4
 │   └── sw.js                              # Service worker — étape 4, enrichi en 7
@@ -413,7 +414,7 @@ Les identifiants techniques sont en anglais pour rester cohérents avec les noms
 - Lucide React exclusivement ; imports nommés pour le tree-shaking. Taille courante 20 ou 24 px, trait cohérent, icône décorative masquée aux technologies d’assistance.
 - Les icônes parent prévues sont `GraduationCap`, `CalendarCheck`, `Wallet`, `Megaphone` et `Bell`, accompagnées d’un libellé.
 - Tokens de couleurs, espacements, rayons et typographie plutôt que valeurs dispersées. Les contrastes sont mesurés, pas seulement estimés.
-- CSS pour les transitions simples ; Motion pour les séquences et le hero. GSAP n’est pas prévu et ne pourrait être ajouté qu’avec une justification écrite validée.
+- CSS pour toutes les animations : le hero de l’accueil public n’utilise que des `@keyframes`. Aucune bibliothèque d’animation n’est embarquée dans le runtime — le poids du JavaScript téléchargé vaut plus qu’un effet qu’une feuille de style rend aussi bien. GSAP n’est pas prévu et ne pourrait être ajouté qu’avec une justification écrite validée.
 - Animations limitées à `transform` et `opacity`, avec alternative `prefers-reduced-motion`.
 
 ### 8.4 Git et revues
@@ -530,7 +531,6 @@ Les outils de test sont des dépendances de développement justifiées par les �
 | `next`, `react`, `typescript`, Tailwind CSS | Application et styles | Stack imposée |
 | `@supabase/supabase-js` et intégration SSR officielle | Auth, Postgres, Realtime et session | Stack imposée, JWT utilisateur conservé |
 | `lucide-react` | Icônes | Seule bibliothèque d’icônes autorisée |
-| `motion` | Séquences d’animation lorsque nécessaire | Stack autorisée ; import limité aux composants concernés |
 | Supabase CLI | Base locale, migrations et tests | Reproductibilité sans toucher à la production ; validation requise avant tout environnement distant |
 | `@electric-sql/pglite` | Tests SQL de l’étape 2 | PostgreSQL réel en WASM sans Docker, uniquement en développement et hors bundle ; voir `docs/SECURITE.md` |
 | Vitest/Testing Library/Playwright | Tests | Couverture exigée par le plan, dépendances de développement |
@@ -550,7 +550,7 @@ Chaque ligne est une porte de validation : l’étape suivante ne commence qu’
 | **5 — Écrans parent** | Résumé, Résultats, Vie scolaire, Paiements, Infos ; états complets et lecture RLS — **livré, voir `docs/ESPACE-PARENT.md`** | Parent multi-enfants sans fuite, lecture seule, petits écrans et réseau lent testés |
 | **6 — Portail école** | Saisies notes/présences, paiements et reçus, annonces aux quatre cibles, accusés de lecture, audit | Permissions par rôle testées, aucune notification prématurée, chaque action tracée |
 | **7 — Notifications** | Abonnement Web Push, distribution Edge, centre lu/non lu, contrat de repli SMS/WhatsApp non implémenté | Payloads minimaux, destinataires exacts, désabonnement et échecs traités, aucun envoi SMS/WhatsApp |
-| **8 — Accueil animé** | Hero public de cinq scènes, mockups SVG/CSS/Motion et contrôles accessibles — **livré, voir `docs/ACCUEIL-PUBLIC.md`** | Rotation 4–5 s, pause, indicateurs, stagger, reduced motion, transform/opacity uniquement |
+| **8 — Accueil animé** | Hero public de cinq scènes, mockups SVG/CSS et contrôles accessibles — **livré, voir `docs/ACCUEIL-PUBLIC.md`** | Rotation 4–5 s, pause, indicateurs, reduced motion, transform/opacity uniquement |
 | **9 — Finalisation** | Tests critiques, audits Lighthouse/accessibilité/hors ligne, README installation/env/Vercel, risques restants | Résultats reproductibles, risques classés, aucune mise en production effectuée sans validation |
 
 ### Ordre technique interne recommandé

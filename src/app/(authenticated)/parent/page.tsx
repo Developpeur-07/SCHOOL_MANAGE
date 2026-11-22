@@ -19,7 +19,7 @@ export default async function ParentHomePage() {
   if (children.length === 0) {
     return (
       <section className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm sm:p-8">
-        <Users aria-hidden="true" className="mx-auto size-9 text-slate-500 sm:size-10" />
+        <Users aria-hidden="true" className="mx-auto size-9 text-slate-600 sm:size-10" />
         <h2 className="mt-4 text-xl font-bold text-slate-950">{messages.parent.noChildrenTitle}</h2>
         <p className="mx-auto mt-2 max-w-md text-slate-600">{messages.parent.noChildrenBody}</p>
       </section>

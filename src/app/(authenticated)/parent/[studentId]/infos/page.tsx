@@ -67,7 +67,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                   {announcement.body}
                 </p>
                 {announcement.publishedAt ? (
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-slate-600">
                     {messages.parent.news.publishedOn} :{' '}
                     {formatDateTime(announcement.publishedAt, profile.schoolLocale)}
                   </p>
@@ -104,7 +104,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               <li key={notification.id} className="py-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="text-sm font-semibold text-slate-900">{notification.title}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-600">
                     {formatDateTime(notification.createdAt, profile.schoolLocale)}
                   </p>
                 </div>

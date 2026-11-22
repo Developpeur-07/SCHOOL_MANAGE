@@ -15,13 +15,18 @@ import {
 } from 'lucide-react';
 import { messages } from '@/shared/config/messages';
 import { hasPublicSiteUrl } from '@/shared/config/site';
+import { OPEN_GRAPH_IMAGE } from '@/shared/metadata';
 import { HeroShowcase } from '@/modules/public-home/ui/hero-showcase';
 import { ProfilesSection } from '@/modules/public-home/ui/profiles-section';
 import { PublicNav } from '@/modules/public-home/ui/public-nav';
 import { SupportPanel } from '@/modules/public-home/ui/support-panel';
+import { ConsentSettingsButton } from '@/modules/privacy/ui/consent-banner';
 
 export const metadata: Metadata = {
-  title: messages.public.hero.title,
+  // Le modèle de titre du layout racine ne s'applique pas à la page du
+  // segment racine : le nom de l'application est ajouté explicitement, pour
+  // que l'onglet du navigateur et le partage social portent le même nom.
+  title: `${messages.public.hero.title} · ${messages.app.name}`,
   description: messages.public.hero.subtitle,
   // L'URL canonique n'est annoncée que si l'adresse publique du site est
   // connue : hors production, `localhost` ne doit pas être présenté comme
@@ -33,6 +38,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fr_FR',
     url: hasPublicSiteUrl() ? '/' : undefined,
+    images: [OPEN_GRAPH_IMAGE],
   },
 };
 
@@ -76,9 +82,15 @@ export default function HomePage() {
                 {messages.public.hero.subtitle}
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                {/*
+                  Appel à l'action unique du site. Il est marqué comme tel
+                  pour que son unicité soit vérifiable et non seulement
+                  supposée : un seul élément porte ce marqueur sur la page.
+                */}
                 <Link
                   href="/connexion"
+                  data-cta="principal"
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-3 font-bold text-white shadow-sm hover:bg-teal-800"
                 >
                   {messages.public.hero.primaryCta}
@@ -86,13 +98,14 @@ export default function HomePage() {
                 </Link>
                 <a
                   href="#usages"
-                  className="inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+                  className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-lg px-1 text-sm font-semibold text-teal-800 underline underline-offset-4 hover:text-teal-900"
                 >
                   {messages.public.hero.secondaryCta}
+                  <ArrowRight aria-hidden="true" className="size-4" />
                 </a>
               </div>
 
-              <p className="mt-3 text-sm text-slate-500">{messages.public.hero.primaryCtaHint}</p>
+              <p className="mt-3 text-sm text-slate-600">{messages.public.hero.primaryCtaHint}</p>
 
               <ul className="mt-8 space-y-2.5">
                 {messages.public.hero.reassurance.map((point) => (
@@ -180,7 +193,7 @@ export default function HomePage() {
               })}
             </ul>
 
-            <p className="mt-6 flex items-start gap-2.5 text-sm text-slate-500">
+            <p className="mt-6 flex items-start gap-2.5 text-sm text-slate-600">
               <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
               <span>{messages.public.usages.note}</span>
             </p>
@@ -219,7 +232,7 @@ export default function HomePage() {
             <p className="mt-5 text-sm font-bold text-slate-950">
               {messages.public.testimonial.author}
             </p>
-            <p className="mt-1 text-xs text-slate-500">{messages.public.testimonial.context}</p>
+            <p className="mt-1 text-xs text-slate-600">{messages.public.testimonial.context}</p>
           </div>
         </section>
 
@@ -234,14 +247,14 @@ export default function HomePage() {
               {messages.app.name}
             </p>
             <p className="mt-1 text-sm text-slate-600">{messages.app.tagline}</p>
-            <p className="mt-3 flex items-start gap-2 text-xs text-slate-500">
+            <p className="mt-3 flex items-start gap-2 text-xs text-slate-600">
               <WifiOff aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
               <span>{messages.public.footer.offlineNote}</span>
             </p>
           </div>
 
           <nav aria-label={messages.public.footer.navigation}>
-            <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+            <p className="text-xs font-bold tracking-wide text-slate-600 uppercase">
               {messages.public.footer.navigation}
             </p>
             <ul className="mt-3 flex flex-col gap-2">
@@ -263,12 +276,44 @@ export default function HomePage() {
               </li>
             </ul>
           </nav>
+
+          <nav aria-label={messages.public.footer.legalLinks}>
+            <p className="text-xs font-bold tracking-wide text-slate-600 uppercase">
+              {messages.public.footer.legalLinks}
+            </p>
+            <ul className="mt-3 flex flex-col gap-2">
+              <li>
+                <Link
+                  href="/confidentialite"
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-700 hover:text-teal-800"
+                >
+                  {messages.public.footer.privacyLink}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/conditions"
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-700 hover:text-teal-800"
+                >
+                  {messages.public.footer.termsLink}
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
 
         <div className="border-t border-slate-200">
-          <p className="mx-auto w-full max-w-6xl px-4 py-5 text-xs text-slate-500 sm:px-6">
-            {messages.public.footer.legal}
-          </p>
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-slate-600 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p>
+              {messages.public.footer.legal} — {messages.public.footer.version}
+            </p>
+            {/*
+              Le retrait du consentement doit rester possible à tout moment,
+              y compris après l'avoir accordé : le bouton n'apparaît que
+              lorsqu'un accord a été donné.
+            */}
+            <ConsentSettingsButton />
+          </div>
         </div>
       </footer>
     </div>

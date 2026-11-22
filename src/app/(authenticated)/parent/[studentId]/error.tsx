@@ -18,7 +18,7 @@ export default function ChildSpaceError({ reset }: { reset: () => void }) {
         <AlertTriangle aria-hidden="true" className="mx-auto mb-3 size-9 text-red-700" />
         <h2 className="text-lg font-bold text-slate-950">{messages.parent.errorTitle}</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">{messages.parent.errorBody}</p>
-        <p className="mx-auto mt-2 flex max-w-md items-center justify-center gap-2 text-xs text-slate-500">
+        <p className="mx-auto mt-2 flex max-w-md items-center justify-center gap-2 text-xs text-slate-600">
           <WifiOff aria-hidden="true" className="size-4 shrink-0" />
           {messages.parent.offlineHint}
         </p>

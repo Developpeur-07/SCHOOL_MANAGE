@@ -128,11 +128,12 @@ test.describe('accueil public', () => {
     await expect(panneau).toBeVisible();
 
     // L'action ne redirige vers aucune destination inventée : elle prépare un
-    // message à transmettre à l'école, et renvoie vers les écrans existants.
+    // message à transmettre à l'école, sans imposer de canal de support.
     await expect(page.getByRole('button', { name: /Copier le message pour mon école/ })).toBeVisible();
     await expect(page.locator('#support-panneau pre')).toContainText('École');
-    await expect(page.locator('section#support a[href="/connexion"]')).toBeVisible();
-    await expect(page.locator('section#support a[href="/hors-ligne"]')).toBeVisible();
+    // Le panneau ne répète pas l'appel à l'action principal de la page.
+    await expect(page.locator('section#support a[href="/connexion"]')).toHaveCount(0);
+    await expect(page.locator('section#support [data-cta="principal"]')).toHaveCount(0);
     // Aucune adresse e-mail ni lien externe inventé.
     await expect(page.locator('section#support a[href^="mailto:"]')).toHaveCount(0);
     await expect(page.locator('section#support a[href^="http"]')).toHaveCount(0);

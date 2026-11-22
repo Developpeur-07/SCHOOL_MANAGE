@@ -112,6 +112,9 @@ test('le rôle interne ne peut ni se connecter ni contourner RLS', async () => {
      order by table_name, privilege_type`,
   );
   assert.deepEqual(tableGrants, [
+    { table_name: 'audience_daily', privilege_type: 'INSERT' },
+    { table_name: 'audience_daily', privilege_type: 'SELECT' },
+    { table_name: 'audience_daily', privilege_type: 'UPDATE' },
     { table_name: 'audit_log', privilege_type: 'INSERT' },
     { table_name: 'profiles', privilege_type: 'SELECT' },
   ]);
@@ -122,9 +125,14 @@ test('le rôle interne ne peut ni se connecter ni contourner RLS', async () => {
      from pg_proc
      join pg_namespace on pg_namespace.oid = pg_proc.pronamespace
      where pg_namespace.nspname = 'public'
-       and proname in ('is_school_member', 'has_school_role', 'audit_business_change')`,
+       and proname in (
+         'is_school_member',
+         'has_school_role',
+         'audit_business_change',
+         'register_audience_visit'
+       )`,
   );
-  assert.equal(functions.length, 3);
+  assert.equal(functions.length, 4);
   for (const fn of functions) {
     assert.equal(fn.prosecdef, true);
     assert.ok(fn.proconfig.includes('row_security=on'));

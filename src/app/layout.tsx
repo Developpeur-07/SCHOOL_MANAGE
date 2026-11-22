@@ -3,7 +3,10 @@ import type { ReactNode } from 'react';
 import '@/styles/globals.css';
 import { messages } from '@/shared/config/messages';
 import { getPublicSiteUrl } from '@/shared/config/site';
+import { OPEN_GRAPH_IMAGE } from '@/shared/metadata';
 import { ServiceWorkerRegistration } from '@/shared/pwa/service-worker-registration';
+import { AudienceMeasurement } from '@/modules/privacy/ui/audience-measurement';
+import { ConsentBanner } from '@/modules/privacy/ui/consent-banner';
 
 export const metadata: Metadata = {
   // Base des URL absolues : canonical, Open Graph. Elle provient de
@@ -23,10 +26,31 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      // Le favicon dédié est prioritaire : c'est lui que les navigateurs
+      // demandent en premier.
+      { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
       { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: '/icons/apple-touch-icon.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: messages.app.name,
+    title: messages.app.name,
+    description: messages.app.tagline,
+    images: [OPEN_GRAPH_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: messages.app.name,
+    description: messages.app.tagline,
+    images: [OPEN_GRAPH_IMAGE.url],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
@@ -49,8 +73,19 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         >
           {messages.common.skipToContent}
         </a>
+        {/*
+          Le bandeau de consentement est placé avant le contenu : il ne
+          masque jamais la page, et il est visible dès l'ouverture.
+        */}
+        <ConsentBanner />
         {children}
         <ServiceWorkerRegistration />
+        {/*
+          La mesure d'audience n'émet rien tant que le consentement n'a pas
+          été donné : le composant lui-même vérifie le choix avant tout
+          appel réseau.
+        */}
+        <AudienceMeasurement />
       </body>
     </html>
   );

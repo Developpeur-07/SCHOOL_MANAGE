@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { DEMO_CREDENTIALS, STUDENT_ERROR } from './mock-supabase.mjs';
 import { mesurer, verifierMiseEnPage } from './mesures.mjs';
+import { connecter } from './connexion.mjs';
 
 /**
  * Étape 5 — espace parent : navigation, isolation, états et responsive.
@@ -24,16 +25,13 @@ const ONGLETS = [
 
 const NAVIGATION = 'Sections de l’espace de l’enfant';
 
-async function connecter(page) {
-  await page.goto('/connexion', { waitUntil: 'networkidle' });
-  await page.getByLabel('Adresse e-mail').fill(DEMO_CREDENTIALS.email);
-  await page.getByLabel('Mot de passe').fill(DEMO_CREDENTIALS.password);
-  await page.getByRole('button', { name: 'Se connecter' }).click();
+async function connecterDemo(page) {
+  await connecter(page, DEMO_CREDENTIALS);
   await page.waitForURL(/\/(compte|parent)/, { timeout: 20_000 });
 }
 
 async function ouvrirEspaceEnfant(page, studentId = STUDENT_A1) {
-  await connecter(page);
+  await connecterDemo(page);
   await page.goto(`/parent/${studentId}`, { waitUntil: 'networkidle' });
   await attendreContenu(page);
 }
@@ -105,7 +103,7 @@ test.describe('espace parent', () => {
   });
 
   test('un enfant non lié affiche la page introuvable', async ({ page }) => {
-    await connecter(page);
+    await connecterDemo(page);
     await page.goto(`/parent/${STUDENT_A3}`, { waitUntil: 'networkidle' });
 
     await expect(
@@ -188,7 +186,7 @@ test.describe('espace parent', () => {
   });
 
   test('un échec de lecture affiche l’état d’erreur et permet de réessayer', async ({ page }) => {
-    await connecter(page);
+    await connecterDemo(page);
     await page.goto(`/parent/${STUDENT_ERROR}`, { waitUntil: 'networkidle' });
 
     const titre = page.getByRole('heading', { name: 'Cet onglet n’a pas pu être chargé' });

@@ -18,6 +18,10 @@ const E2E_SUPABASE_URL = `http://127.0.0.1:${MOCK_SUPABASE_PORT}`;
 const E2E_ENV = {
   NEXT_PUBLIC_SUPABASE_URL: E2E_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: 'cle-publique-locale-de-test',
+  // L'adresse publique du site est connue des tests : le plan du site et
+  // les URL canoniques sont ainsi réellement produits, comme en production.
+  // L'hôte reste local : la redirection vers HTTPS ne se déclenche donc pas.
+  NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${E2E_PORT}`,
 };
 
 export default defineConfig({

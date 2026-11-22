@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mesurer, verifierMiseEnPage } from './mesures.mjs';
 
 test('le manifeste, les icônes et les en-têtes du service worker sont valides', async ({ request }) => {
   const manifestResponse = await request.get('/manifest.webmanifest');
@@ -71,18 +72,8 @@ for (const path of ['/', '/connexion', '/compte-desactive', '/hors-ligne']) {
     expect(dimensions.document).toBeLessThanOrEqual(360);
     expect(dimensions.body).toBeLessThanOrEqual(360);
 
-    const undersizedTargets = await page.locator('a, button, input, select').evaluateAll((elements) => elements
-      .filter((element) => {
-        const style = getComputedStyle(element);
-        const rect = element.getBoundingClientRect();
-        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-      })
-      .map((element) => ({
-        label: element.textContent || element.getAttribute('aria-label') || element.id,
-        height: element.getBoundingClientRect().height,
-      }))
-      .filter((target) => target.height < 44));
-    expect(undersizedTargets).toEqual([]);
+    const mesures = await mesurer(page);
+    expect(verifierMiseEnPage(mesures)).toEqual([]);
 
     if (path === '/connexion') {
       await page.screenshot({ path: testInfo.outputPath('connexion-360.png'), fullPage: true });

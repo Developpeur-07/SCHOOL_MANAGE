@@ -5,6 +5,7 @@ import {
   SUPERVISION_CREDENTIALS,
 } from './mock-supabase.mjs';
 import { mesurer, verifierMiseEnPage } from './mesures.mjs';
+import { connecter } from './connexion.mjs';
 
 /**
  * Étape 6 — supervision globale du management.
@@ -21,11 +22,8 @@ import { mesurer, verifierMiseEnPage } from './mesures.mjs';
  *  - la mise en page mobile de la page de supervision.
  */
 
-async function connecter(page, identifiants) {
-  await page.goto('/connexion', { waitUntil: 'networkidle' });
-  await page.getByLabel('Adresse e-mail').fill(identifiants.email);
-  await page.getByLabel('Mot de passe').fill(identifiants.password);
-  await page.getByRole('button', { name: 'Se connecter' }).click();
+async function connecterRole(page, identifiants) {
+  await connecter(page, identifiants);
   await page.waitForURL(/\/(compte|parent|supervision)/, { timeout: 20_000 });
 }
 
@@ -36,7 +34,7 @@ test.describe('supervision globale', () => {
   });
 
   test('le compte de supervision accède à la vue d’ensemble des écoles', async ({ page }) => {
-    await connecter(page, SUPERVISION_CREDENTIALS);
+    await connecterRole(page, SUPERVISION_CREDENTIALS);
     await page.waitForURL(/\/supervision/, { timeout: 20_000 });
 
     await expect(
@@ -63,7 +61,7 @@ test.describe('supervision globale', () => {
   });
 
   test('la supervision reste strictement consultative', async ({ page }) => {
-    await connecter(page, SUPERVISION_CREDENTIALS);
+    await connecterRole(page, SUPERVISION_CREDENTIALS);
     await page.waitForURL(/\/supervision/, { timeout: 20_000 });
 
     await expect(
@@ -79,7 +77,7 @@ test.describe('supervision globale', () => {
   test('un parent est renvoyé vers son espace et n’atteint pas la supervision', async ({
     page,
   }) => {
-    await connecter(page, DEMO_CREDENTIALS);
+    await connecterRole(page, DEMO_CREDENTIALS);
     await page.goto('/supervision', { waitUntil: 'networkidle' });
 
     await expect(page).toHaveURL(/\/parent/);
@@ -90,7 +88,7 @@ test.describe('supervision globale', () => {
   });
 
   test('un rôle d’école est renvoyé vers le portail de son école', async ({ page }) => {
-    await connecter(page, DIRECTION_CREDENTIALS);
+    await connecterRole(page, DIRECTION_CREDENTIALS);
     await page.goto('/supervision', { waitUntil: 'networkidle' });
 
     await expect(page).toHaveURL(/\/ecole/);
@@ -100,7 +98,7 @@ test.describe('supervision globale', () => {
   });
 
   test('la page de supervision tient dans un écran de téléphone', async ({ page }) => {
-    await connecter(page, SUPERVISION_CREDENTIALS);
+    await connecterRole(page, SUPERVISION_CREDENTIALS);
     await page.waitForURL(/\/supervision/, { timeout: 20_000 });
 
     await page.setViewportSize({ width: 360, height: 800 });

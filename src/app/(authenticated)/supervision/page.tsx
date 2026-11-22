@@ -103,37 +103,37 @@ export default async function SupervisionPage() {
 
                 <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.studentsColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.studentsColumn}</dt>
                     <dd className="font-bold text-slate-900">{school.studentsCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.staffColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.staffColumn}</dt>
                     <dd className="font-bold text-slate-900">{school.staffCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.parentsColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.parentsColumn}</dt>
                     <dd className="font-bold text-slate-900">{school.parentsCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.classesColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.classesColumn}</dt>
                     <dd className="font-bold text-slate-900">{school.classesCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.gradesColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.gradesColumn}</dt>
                     <dd className="font-bold text-slate-900">{school.publishedGradesCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.announcementsColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.announcementsColumn}</dt>
                     <dd className="font-bold text-slate-900">
                       {school.publishedAnnouncementsCount}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.notificationsColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.notificationsColumn}</dt>
                     <dd className="font-bold text-slate-900">{school.notificationsCount}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">{messages.supervision.outstandingColumn}</dt>
+                    <dt className="text-xs text-slate-600">{messages.supervision.outstandingColumn}</dt>
                     <dd className="font-bold text-slate-900">
                       {school.outstandingFeesCount}
                       {school.outstandingAmountMinor > 0 ? (
@@ -184,18 +184,18 @@ export default async function SupervisionPage() {
               className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
             >
               <p className="flex items-center gap-2 text-sm font-bold text-slate-950">
-                <Building2 aria-hidden="true" className="size-4 text-slate-500" />
+                <Building2 aria-hidden="true" className="size-4 text-slate-600" />
                 {currency.currencyCode}
               </p>
               <dl className="mt-2 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <dt className="text-xs text-slate-500">{messages.supervision.outstandingTotal}</dt>
+                  <dt className="text-xs text-slate-600">{messages.supervision.outstandingTotal}</dt>
                   <dd className="font-bold text-slate-900">
                     {formatMinorAmount(currency.outstandingAmountMinor, currency.currencyCode)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-slate-500">{messages.supervision.collectedTotal}</dt>
+                  <dt className="text-xs text-slate-600">{messages.supervision.collectedTotal}</dt>
                   <dd className="font-bold text-slate-900">
                     {formatMinorAmount(currency.collectedAmountMinor, currency.currencyCode)}
                   </dd>

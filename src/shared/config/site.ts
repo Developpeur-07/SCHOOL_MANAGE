@@ -34,8 +34,7 @@ export function hasPublicSiteUrl(): boolean {
   );
 }
 
-/** URL de base du site, servant aux métadonnées et aux URL canoniques. */
-export function getPublicSiteUrl(): string {
+/** URL de base du site, servant aux métadonnées et aux URL canoniques. */export function getPublicSiteUrl(): string {
   const explicite = lireVariable('NEXT_PUBLIC_SITE_URL');
   if (explicite) {
     try {
@@ -53,4 +52,17 @@ export function getPublicSiteUrl(): string {
   if (vercel) return `https://${vercel.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
 
   return REPLI_LOCAL;
+}
+
+/**
+ * Canonique d'une page, annoncée uniquement si l'adresse publique est connue.
+ *
+ * Hors production — en développement, en test ou en prévisualisation — le
+ * site n'a pas d'adresse de référence. Publier `http://localhost:3000` comme
+ * canonique serait une information fausse : mieux vaut ne rien annoncer, ce
+ * que fait `alternates: undefined`.
+ */
+export function canonicalPath(path: string): { canonical: string } | undefined {
+  if (!hasPublicSiteUrl()) return undefined;
+  return { canonical: path };
 }

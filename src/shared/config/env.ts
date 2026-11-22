@@ -45,6 +45,14 @@ function assertNotSecretKey(anonKey: string): void {
   }
 }
 
+/**
+ * Configuration Supabase publique, lisible par le navigateur.
+ *
+ * Ce module ne contient que des variables publiques : il est importé par
+ * des composants clients, et ne doit donc jamais lire une variable d
+ * environnement réservée au serveur. La configuration serveur vit dans
+ * `env-server.ts`, que le client n'importe jamais.
+ */
 export function getSupabasePublicConfig(): SupabasePublicConfig {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -65,32 +73,5 @@ export function getSupabasePublicConfig(): SupabasePublicConfig {
   }
 
   assertNotSecretKey(anonKey);
-  return { url: parsedUrl.toString().replace(/\/$/, ''), anonKey };
-}
-
-/**
- * Configuration Supabase utilisée par le code serveur.
- *
- * Elle reprend l’URL publique, sauf si `SUPABASE_INTERNAL_URL` est définie :
- * le navigateur passe alors par une origine publique relayée vers le
- * Supabase local, tandis que le serveur joint directement cet hôte interne.
- */
-export function getSupabaseServerConfig(): SupabasePublicConfig {
-  const { url, anonKey } = getSupabasePublicConfig();
-  const internalUrl = process.env.SUPABASE_INTERNAL_URL;
-
-  if (!internalUrl) return { url, anonKey };
-
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(internalUrl);
-  } catch {
-    throw new Error('SUPABASE_INTERNAL_URL_INVALID');
-  }
-
-  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-    throw new Error('SUPABASE_INTERNAL_URL_INVALID');
-  }
-
   return { url: parsedUrl.toString().replace(/\/$/, ''), anonKey };
 }

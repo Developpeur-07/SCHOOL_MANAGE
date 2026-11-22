@@ -47,7 +47,7 @@ function Ligne({
     <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-2.5">
       <span className="shrink-0 rounded-lg bg-teal-50 p-1.5 text-teal-800">{icone}</span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+        <span className="block text-[11px] font-semibold tracking-wide text-slate-600 uppercase">
           {label}
         </span>
         <span className="block truncate text-sm font-bold text-slate-950">{value}</span>
@@ -84,7 +84,7 @@ function SceneResultats() {
   return (
     <SceneFrame titre={messages.parent.tabs.resultats}>
       <div className="rounded-xl border border-slate-200 bg-white p-3">
-        <p className="text-[11px] font-semibold text-slate-500">
+        <p className="text-[11px] font-semibold text-slate-600">
           {messages.parent.results.average}
         </p>
         <p className="mt-0.5 text-2xl font-extrabold text-slate-950">14,5 / 20</p>

@@ -2,15 +2,24 @@
 
 > Périmètre : email/mot de passe, session Supabase, redirection par rôle, layouts et sélecteur d’enfant.
 > Aucune note, présence, donnée financière, annonce ou autre contenu métier n’est affiché.
+>
+> La protection anti-spam et la validation du formulaire ajoutées lors de la
+> mise en conformité avant mise en ligne sont décrites dans
+> **[MISE-EN-LIGNE.md](MISE-EN-LIGNE.md)**.
 
 ## 1. Parcours implémenté
 
 1. `/connexion` affiche le formulaire email/mot de passe.
-2. Le navigateur appelle `supabase.auth.signInWithPassword` avec la clé **publique** uniquement.
-3. Après succès, `/compte` lit l’utilisateur avec `supabase.auth.getUser()` côté serveur, puis son profil Postgres via RLS.
-4. Le rôle du profil détermine l’espace de destination.
-5. Chaque layout protégé revérifie le profil actif et la zone autorisée.
-6. La déconnexion appelle `supabase.auth.signOut()`, puis revient à `/connexion`.
+2. Le navigateur appelle `POST /api/auth/login` avec l’e-mail, le mot de passe
+   et les deux signaux anti-spam (champ piège, délai de saisie).
+3. Le serveur vérifie ces signaux, puis appelle le service d’authentification
+   avec la clé **serveur** — la clé publique ne quitte jamais le navigateur
+   pour cette opération.
+4. La session est créée côté serveur, puis `/compte` lit l’utilisateur avec
+   `supabase.auth.getUser()`, et son profil Postgres via RLS.
+5. Le rôle du profil détermine l’espace de destination.
+6. Chaque layout protégé revérifie le profil actif et la zone autorisée.
+7. La déconnexion appelle `supabase.auth.signOut()`, puis revient à `/connexion`.
 
 | Rôle | Zone | Destination |
 | --- | --- | --- |
@@ -250,14 +259,37 @@ Après autorisation explicite, les migrations distantes 3 à 5 ont été appliqu
 - Les erreurs d’authentification distinguent le cas « identifiants invalides » (sans révéler l’existence d’un compte) des pannes de service et des erreurs réseau ; seule une référence technique non sensible est affichée.
 - Les logs client ne contiennent ni mot de passe, ni session, ni profil.
 - Les cookies sont gérés par `@supabase/ssr`, sans token écrit dans le code ou un stockage applicatif maison.
-- Seuls Lucide React, Next.js et les clients Supabase nécessaires ont été ajoutés au runtime ; Motion, GSAP et toute autre bibliothèque d’animation restent absents.
+- Seuls Lucide React, Next.js et les clients Supabase nécessaires ont été ajoutés au runtime ; aucune bibliothèque d’animation n’est embarquée, pas plus que GSAP.
 - `minimatch` est épinglé à `11.0.5` uniquement dans la dépendance de développement `@typescript-eslint/typescript-estree`, pour corriger GHSA-g3hv-75wg-m249 sans modifier les versions 3.x utilisées par les plugins ESLint.
+- **Connexion par le serveur** (`POST /api/auth/login`) : la session n’est pas
+  créée depuis le navigateur, et les échecs sont comptés là où un compteur
+  client serait effaçable d’un simple rechargement.
+- **Protection anti-spam à trois barrières** :
+  - un champ piège, hors écran, hors tabulation et hors autocomplétion ; le
+    formulaire ne peut pas être envoyé sans le remplir ;
+  - un délai minimal de saisie de 1,2 s après l’ouverture du formulaire, ce
+    qui exclut la soumission instantanée d’un robot ;
+  - une limitation des tentatives côté serveur
+    (`src/modules/auth/domain/login-rate-limit.ts`), qui compte les **échecs**
+    et jamais les succès — un utilisateur légitime qui se connecte souvent
+    n’est donc jamais bloqué.
+- Deux compartiments sont suivis séparément, l’adresse d’origine et le compte
+  visé, et conservés uniquement sous forme d’empreinte SHA-256 : le
+  limiteur ne détient aucune adresse IP ni aucun e-mail en clair.
+- Le limiteur s’applique immédiatement, sans dépendre de la base : la
+  protection est active dès la première mise en ligne, avant l’application
+  des migrations.
+- Le formulaire valide chaque champ lui-même, en français, avec
+  `aria-invalid`, `aria-describedby` et déplacement du focus vers le champ
+  fautif. La validation native du navigateur est désactivée : ses bulles ne
+  sont ni traduisibles, ni annoncées par un lecteur d’écran, ni associables
+  au champ.
 
 ## 7. Vérifications exécutées
 
-- **48 tests unitaires Vitest** : rôles, gardes, profils, sélecteur, configuration et classification des erreurs de connexion.
-- **32 tests SQL/RLS** de l’étape 2 conservés.
-- **26 tests E2E Playwright** : manifeste et service worker (6), matrice responsive 320 → 1440 px (20).
+- **183 tests unitaires Vitest** : rôles, gardes, profils, sélecteur, configuration, classification des erreurs de connexion, champ piège, délai de saisie et limitation des tentatives.
+- **56 tests SQL/RLS** de l’étape 2 conservés.
+- **105 tests E2E Playwright** : manifeste et service worker, matrice responsive 320 → 1440 px, parcours parent et supervision, conformité du site.
 - `npm run lint` : réussi.
 - `npm run typecheck` : réussi.
 - `npm run build` : réussi avec Next.js 16.4.5 ; routes protégées dynamiques.

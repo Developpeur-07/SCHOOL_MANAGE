@@ -1,7 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { messages } from '@/shared/config/messages';
 import {
@@ -25,11 +24,36 @@ import { SceneMockup, type SceneKey } from './scene-mockups';
  * - `prefers-reduced-motion` respecté : plus de rotation ni de décalage, le
  *   contenu reste statique et sélectionnable par les indicateurs.
  *
- * Le composant reste utilisable sans JavaScript : la première scène est
- * rendue par le serveur et la liste des scènes est annoncée.
+ * La transition entre deux scènes est une animation CSS, et non une
+ * animation JavaScript : elle ne coûte aucun script à télécharger, et le
+ * navigateur la supprime seul quand l'internaute demande moins
+ * d'animations. Le composant reste utilisable sans JavaScript : la
+ * première scène est rendue par le serveur et la liste des scènes est
+ * annoncée.
  */
 
 const SCENES = getPublicScenes(messages.public.hero.scenes);
+
+/**
+ * Préférence d'animation réduite.
+ *
+ * Le navigateur la signale lui-même ; la suivre permet de suspendre la
+ * rotation, qui n'est pas une simple décoration mais un changement de
+ * contenu.
+ */
+function usePrefersReducedMotion(): boolean {
+  const [reduite, setReduite] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const actualiser = () => setReduite(media.matches);
+    actualiser();
+    media.addEventListener('change', actualiser);
+    return () => media.removeEventListener('change', actualiser);
+  }, []);
+
+  return reduite;
+}
 
 export function HeroShowcase() {
   const [index, setIndex] = useState(0);
@@ -41,7 +65,7 @@ export function HeroShowcase() {
   const conteneur = useRef<HTMLDivElement>(null);
   const indicateurs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Le hero ne s'anime que s'il est visible à l'écran.
   useEffect(() => {
@@ -86,19 +110,6 @@ export function HeroShowcase() {
 
   const scene = SCENES[index] ?? SCENES[0];
 
-  const contenu = useMemo(
-    () => ({
-      initial: { opacity: 0, y: prefersReducedMotion ? 0 : 12 },
-      animate: { opacity: 1, y: 0 },
-      exit: { opacity: 0, y: prefersReducedMotion ? 0 : -12 },
-      transition: {
-        duration: prefersReducedMotion ? 0 : 0.35,
-        ease: [0.22, 1, 0.36, 1] as const,
-      },
-    }),
-    [prefersReducedMotion],
-  );
-
   // Les indicateurs se parcourent avec les flèches, comme un carrousel.
   // Le déplacement part de l'indicateur focalisé, et non de la scène active :
   // c'est le comportement attendu d'une liste d'onglets au clavier.
@@ -137,13 +148,11 @@ export function HeroShowcase() {
         aria-label={messages.public.hero.sceneLabel}
         className="relative"
       >
-        <LazyMotion features={domAnimation}>
-          <AnimatePresence mode="wait" initial={false}>
-            <m.div key={scene.id} {...contenu}>
-              <SceneMockup scene={scene.id as SceneKey} />
-            </m.div>
-          </AnimatePresence>
-        </LazyMotion>
+        {/* La clé force le remontage de l'élément à chaque changement de
+            scène : l'animation CSS repart alors de son début. */}
+        <div key={scene.id} className="scene-entree">
+          <SceneMockup scene={scene.id as SceneKey} />
+        </div>
       </div>
 
       <p aria-live="polite" className="sr-only">
@@ -198,7 +207,7 @@ export function HeroShowcase() {
         </button>
       </div>
 
-      <p className="mt-3 text-xs text-slate-500">{messages.public.hero.previewNote}</p>
+      <p className="mt-3 text-xs text-slate-600">{messages.public.hero.previewNote}</p>
     </div>
   );
 }

@@ -81,7 +81,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
                         {grade.score}/{grade.maxScore}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-slate-600">
                       {grade.periodName}
                       {grade.publishedAt ? ` · ${formatShortDate(grade.publishedAt)}` : ''}
                     </p>

@@ -13,7 +13,7 @@ export default function ChildSpaceLoading() {
         <LoaderCircle aria-hidden="true" className="size-5 animate-spin text-teal-700" />
         {messages.parent.loadingTitle}
       </p>
-      <p className="text-sm text-slate-500">{messages.parent.loadingHint}</p>
+      <p className="text-sm text-slate-600">{messages.parent.loadingHint}</p>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-hidden="true">
         {Array.from({ length: 4 }, (_, index) => (

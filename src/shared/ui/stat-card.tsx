@@ -15,7 +15,7 @@ export function StatCard({ label, value, detail, icon }: StatCardProps) {
         <span className="shrink-0 rounded-lg bg-teal-50 p-2 text-teal-800">{icon}</span>
       ) : null}
       <div className="min-w-0">
-        <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">{label}</p>
+        <p className="text-xs font-semibold tracking-wide text-slate-600 uppercase">{label}</p>
         <p className="mt-1 text-xl font-extrabold text-slate-950">{value}</p>
         {detail ? <p className="mt-0.5 text-sm text-slate-600">{detail}</p> : null}
       </div>

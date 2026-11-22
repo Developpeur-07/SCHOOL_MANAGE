@@ -12,7 +12,7 @@ export function EmptyState({ title, hint, icon }: EmptyStateProps) {
     <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
       {icon ? <div className="mb-2 flex justify-center text-slate-400">{icon}</div> : null}
       <p className="text-sm font-semibold text-slate-700">{title}</p>
-      {hint ? <p className="mt-1 text-sm text-slate-500">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-sm text-slate-600">{hint}</p> : null}
     </div>
   );
 }

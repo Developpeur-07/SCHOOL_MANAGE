@@ -8,6 +8,10 @@ La page est **entièrement publique**. Elle ne lit aucune donnée Supabase,
 ne dépend d'aucune session et reste servie depuis le cache du service worker,
 y compris hors connexion.
 
+La mise en conformité du site avant mise en ligne — pages légales,
+bandeau de consentement, appel à l'action unique, métadonnées sociales,
+HTTPS — est décrite dans **[MISE-EN-LIGNE.md](MISE-EN-LIGNE.md)**.
+
 ---
 
 ## 1. Implémentation
@@ -17,7 +21,7 @@ y compris hors connexion.
 | `src/app/page.tsx` | Composition de l'accueil : hero, bénéfices, usages, profils, témoignage, support, pied de page |
 | `src/app/layout.tsx` | `metadataBase` : base des URL absolues (canonical, Open Graph) |
 | `src/modules/public-home/domain/scenes.ts` | Ordre des scènes, rotation, indexation, association aux libellés |
-| `src/modules/public-home/ui/hero-showcase.tsx` | Hero : rotation, pause, indicateurs, clavier, reduced motion |
+| `src/modules/public-home/ui/hero-showcase.tsx` | Hero : rotation, pause, indicateurs, clavier, reduced motion — sans bibliothèque d'animation |
 | `src/modules/public-home/ui/scene-mockups.tsx` | Maquettes statiques des cinq écrans de l'espace parent |
 | `src/modules/public-home/ui/public-nav.tsx` | Navigation publique et menu mobile |
 | `src/modules/public-home/ui/profiles-section.tsx` | Section « Un écran adapté à chaque profil » |
@@ -64,15 +68,17 @@ Le carrousel est un `role="group"` avec `aria-roledescription="carrousel"`.
 - Les animations sont limitées à `transform` et `opacity` : translation
   verticale de 12 px et fondu. Aucune propriété de mise en page n'est
   animée, donc aucune reflow pendant la rotation.
-- `prefers-reduced-motion` est respecté via `useReducedMotion()` de Motion :
-  la rotation automatique est suspendue, les transitions sont instantanées et
-  le décalage vertical est supprimé. Les indicateurs restent utilisables, ce
-  qui laisse au visiteur le contrôle du contenu.
-- Le rendu global du CSS neutralise déjà les animations en
-  `prefers-reduced-motion: reduce` (`src/styles/globals.css`).
-- Motion est chargé via `LazyMotion` avec le seul bundle `domAnimation` :
-  les fonctions de mise en page et de glisser-déposer ne sont pas
-  embarquées.
+- `prefers-reduced-motion` est respecté : la rotation automatique est
+  suspendue, et la règle générale du CSS neutralise l'animation d'entrée
+  (`src/styles/globals.css`). Les indicateurs restent utilisables, ce qui
+  laisse au visiteur le contrôle du contenu.
+- La transition entre deux scènes est une animation **CSS**
+  (`@keyframes scene-entree`), et non une animation JavaScript. Elle ne
+  coûte aucun script à télécharger ni à exécuter : c'est la raison pour
+  laquelle le hero n'utilise plus de bibliothèque d'animation.
+- La préférence d'animation réduite est suivie par un `matchMedia` local
+  (`usePrefersReducedMotion`) : le navigateur lui-même signale la
+  préférence, sans dépendre d'une bibliothèque.
 
 Le premier rendu est servi par le serveur : sans JavaScript, la première
 scène reste lisible et le reste du contenu de la page est complet.
@@ -135,10 +141,10 @@ l'application.
 
 ### Tests automatisés
 
-- **129 tests unitaires Vitest**, dont 13 sur le domaine des scènes
+- **183 tests unitaires Vitest**, dont 13 sur le domaine des scènes
   (rotation, bouclage, indexation, ordre) et 8 sur l'URL publique du site ;
-- **47 tests SQL/RLS** ;
-- **83 tests Playwright Chromium**, dont une nouvelle suite
+- **56 tests SQL/RLS** ;
+- **105 tests Playwright Chromium**, dont une nouvelle suite
   `tests/e2e/landing.spec.mjs` (8 tests) :
   - cinq scènes exposées, dans l'ordre des onglets ;
   - la rotation avance d'une scène ;
@@ -148,6 +154,12 @@ l'application.
   - le panneau support s'ouvre et ne contient aucun `mailto:` ni lien externe ;
   - le menu mobile s'ouvre et se referme ;
   - aucun débordement ni cible trop petite à 360 px ;
+- une suite `tests/e2e/conformite.spec.mjs` (21 tests) vérifie les vingt
+  points de conformité dans le navigateur : pages légales, métadonnées
+  sociales, favicon, plan du site, `robots.txt`, en-têtes de sécurité,
+  bandeau de consentement et absence de mesure avant accord, validation du
+  formulaire, refus des soumissions automatisées, appel à l'action unique et
+  absence de lien cassé ;
 - lint et TypeScript strict : réussis ;
 - build de production : réussi, `/` toujours prérendue en statique.
 
@@ -155,10 +167,13 @@ l'application.
 
 | Route | Performance | Accessibilité | Bonnes pratiques | SEO |
 | --- | ---: | ---: | ---: | ---: |
-| `/` | **96** | **100** | **100** | **100** |
-| `/connexion` | **99** | **100** | **100** | **100** |
-| `/compte-desactive` | **99** | **100** | **100** | **100** |
-| `/hors-ligne` | **100** | **100** | **100** | **100** |
+| `/` | **98** | **100** | **100** | **100** |
+| `/connexion` | **92 – 95** | **100** | **100** | **100** |
+| `/compte-desactive` | **95 – 96** | **100** | **100** | **100** |
+| `/hors-ligne` | **96 – 97** | **100** | **100** | **100** |
+
+Le décalage de mise en page (CLS) est nul : le bandeau de consentement
+réserve l'espace qu'il occupe au lieu de pousser le contenu.
 
 Toutes les catégories mesurées dépassent **90/100**. Les catégories PWA
 historiques ne sont plus exposées par Lighthouse 13 ; l'installation reste

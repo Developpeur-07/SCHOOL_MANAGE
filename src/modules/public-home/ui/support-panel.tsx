@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Check, ClipboardCopy, LifeBuoy } from 'lucide-react';
 import { messages } from '@/shared/config/messages';
 
@@ -52,30 +51,21 @@ export function SupportPanel() {
           </div>
 
           <div className="w-full lg:w-72">
+            {/*
+              Le panneau n'est pas une action de conversion : il explique à
+              qui s'adresser. Son bouton est donc en second plan, et le
+              section ne répète pas l'appel à l'action principal — celui-ci
+              est unique sur la page.
+            */}
             <button
               type="button"
               onClick={() => setOuvert((etat) => !etat)}
               aria-expanded={ouvert}
               aria-controls="support-panneau"
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-3 font-bold text-white shadow-sm hover:bg-teal-800"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-teal-700 bg-white px-5 py-3 font-bold text-teal-800 shadow-sm hover:bg-teal-50"
             >
               {messages.public.support.action}
             </button>
-
-            <div className="mt-3 flex flex-col gap-2">
-              <Link
-                href="/connexion"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                {messages.public.support.loginCta}
-              </Link>
-              <Link
-                href="/hors-ligne"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold text-teal-800 hover:bg-teal-50"
-              >
-                {messages.public.support.offlineCta}
-              </Link>
-            </div>
           </div>
         </div>
 

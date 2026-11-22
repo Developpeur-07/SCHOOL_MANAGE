@@ -3,6 +3,10 @@
 > Étape 2 — schéma local et tests, sans déploiement.
 >
 > Les exemples et les seeds sont entièrement fictifs. Aucune instance distante ou de production n’a été modifiée.
+>
+> La mise en conformité du site avant mise en ligne — pages légales, HTTPS,
+> en-têtes de sécurité, consentement, mesure d’audience, anti-spam — est
+> décrite dans **[MISE-EN-LIGNE.md](MISE-EN-LIGNE.md)**.
 
 ## 1. Livrables
 
@@ -277,7 +281,18 @@ npm install
 npm run test:db
 ```
 
-Dernier résultat obtenu : **40 tests réussis, 0 échec** (32 historiques + 8 ajoutés à l’étape 5 pour l’espace parent : isolation multi-enfants, absence de brouillon, filtrage des annonces et notifications, refus d’écriture et de suppression, révocation d’un lien).
+Dernier résultat obtenu : **56 tests réussis, 0 échec**.
+
+- **32 historiques** : isolation, droits et règles métier ;
+- **8** ajoutés à l’étape 5 pour l’espace parent : isolation multi-enfants,
+  absence de brouillon, filtrage des annonces et notifications, refus
+  d’écriture et de suppression, révocation d’un lien ;
+- **9** ajoutés pour la mesure d’audience
+  (`supabase/tests/audience.test.mjs`) : agrégats quotidiens par chemin,
+  cloisonnement des écoles, refus des écritures directes par le rôle
+  anonyme, liste blanche des chemins publics, absence de donnée personnelle
+  conservée, et cloisonnement du rôle interne ;
+- **7** de supervision globale (étape 6).
 
 ### 8.2 Ce que les tests prouvent dans cet environnement
 
@@ -318,6 +333,29 @@ la base :
   école, un parent que ses enfants liés ;
 - `is_super_admin()` ne répond `true` que pour le rôle de supervision actif ;
 - la désactivation du profil coupe immédiatement tous les accès.
+
+### 8.4 bis. Mesure d’audience — première partie et facultative
+
+La mesure d’audience est la seule chose que le site mesure sur ses
+visiteurs. Elle est donc contrainte à ce qu’elle peut faire sans
+disposer d’un accord.
+
+- la table `public.audience_daily` ne contient qu’un compteur par jour et
+  par chemin : ni identifiant, ni adresse IP, ni donnée personnelle ;
+- l’écriture passe par la fonction `public.register_audience_visit`, qui
+  applique elle-même sa liste blanche de chemins publics et incrémente le
+  compteur de la journée ;
+- le rôle anonyme n’a aucun droit direct sur la table : les compteurs ne
+  peuvent pas être faussés depuis le navigateur, ni effacés ;
+- le rôle interne se voit retirer le droit d’`UPDATE` direct sur les
+  compteurs : il passe par la fonction, comme le rôle anonyme ;
+- la RLS est forcée sur la table, et l’accès en écriture est refusé à
+  toute autre voie que la fonction sécurisée.
+
+La preuve que le consentement conditionne la mesure est faite par le
+navigateur (`tests/e2e/conformite.spec.mjs`) : aucune requête vers
+`/api/measure` n’est émise tant que le choix n’est pas enregistré, et le
+retrait du consentement arrête immédiatement toute nouvelle mesure.
 
 ### 8.4 Tests E2E et doublure Supabase locale (étape 5)
 

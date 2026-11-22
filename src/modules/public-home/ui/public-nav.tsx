@@ -71,9 +71,14 @@ export function PublicNav() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          {/*
+            La connexion est l'action principale du site, mais elle n'est
+            présentée qu'une seule fois en accentué : dans l'en-tête, elle
+            reste un accès de service, en second plan.
+          */}
           <Link
             href="/connexion"
-            className="inline-flex min-h-11 items-center rounded-lg bg-teal-700 px-3 py-2 text-sm font-bold text-white shadow-sm hover:bg-teal-800 sm:px-4"
+            className="inline-flex min-h-11 items-center rounded-lg border border-teal-700 bg-white px-3 py-2 text-sm font-bold text-teal-800 hover:bg-teal-50 sm:px-4"
           >
             {messages.public.nav.login}
           </Link>

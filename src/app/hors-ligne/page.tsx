@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { WifiOff } from 'lucide-react';
 import { messages } from '@/shared/config/messages';
+import { RetryButton } from './retry-button';
 
 export const metadata: Metadata = { title: messages.offline.title };
 
@@ -20,15 +21,15 @@ export default function OfflinePage() {
           {messages.offline.title}
         </h1>
         <p className="mt-3 text-slate-600">{messages.offline.body}</p>
-        <p className="mt-3 text-sm text-slate-500">{messages.offline.privacy}</p>
+        <p className="mt-3 text-sm text-slate-600">{messages.offline.privacy}</p>
 
         <div className="mt-6 grid gap-3">
-          <a
-            href=""
-            className="inline-flex min-h-12 items-center justify-center rounded-lg bg-teal-700 px-5 py-3 font-bold text-white hover:bg-teal-800"
-          >
-            {messages.common.retry}
-          </a>
+          {/*
+            « Réessayer » recharge la page demandée : un lien vers « la page
+            courante » ne peut pas être écrit en dur, et un lien vide
+            (`href=""`) était un lien cassé.
+          */}
+          <RetryButton />
           <Link
             href="/"
             className="inline-flex min-h-12 items-center justify-center rounded-lg px-5 py-3 font-semibold text-teal-800"

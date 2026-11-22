@@ -77,8 +77,12 @@ test('l’accueil public présente toutes ses rubriques', async ({ page }) => {
   }
 
   // Un seul titre de niveau 1, et une hiérarchie de titres cohérente.
-  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(5);
+  // Les titres sont comptés dans le contenu principal : le bandeau de
+  // consentement est une région distincte, présente ou non selon le choix
+  // de l'internaute.
+  const contenu = page.locator('main');
+  await expect(contenu.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(contenu.getByRole('heading', { level: 2 })).toHaveCount(5);
 });
 
 test('le formulaire de connexion reste utilisable sur téléphone', async ({ page }) => {

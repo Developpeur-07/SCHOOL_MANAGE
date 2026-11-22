@@ -98,7 +98,7 @@ export default async function PaymentsPage({ params }: PaymentsPageProps) {
                 <li key={fee.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-900">{fee.label}</p>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 text-xs text-slate-600">
                       {messages.parent.payments.dueDate} : {formatSchoolDate(fee.dueOn)}
                     </p>
                   </div>
@@ -109,7 +109,7 @@ export default async function PaymentsPage({ params }: PaymentsPageProps) {
                     <p className="mt-0.5 text-xs font-semibold text-slate-600">
                       {messages.parent.payments.status[fee.status]}
                       {fee.remainingMinor > 0 ? (
-                        <span className="ml-2 font-normal text-slate-500">
+                        <span className="ml-2 font-normal text-slate-600">
                           {messages.parent.payments.remaining} :{' '}
                           {formatMinorAmount(fee.remainingMinor, currency, profile.schoolLocale)}
                         </span>
